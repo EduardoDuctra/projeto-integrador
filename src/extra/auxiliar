@@ -3,5 +3,6 @@
   "cpf": "12345678901",
   "telefone": "999999999",
   "email": "eduardo@email.com",
-  "senha": "123456"
+  "senha": "123456",
+   "status": "ATIVO"
 }

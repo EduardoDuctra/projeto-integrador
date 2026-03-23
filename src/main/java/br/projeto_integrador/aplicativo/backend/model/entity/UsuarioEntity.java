@@ -1,5 +1,6 @@
 package br.projeto_integrador.aplicativo.backend.model.entity;
 
+import br.projeto_integrador.aplicativo.backend.model.enums.StatusUsuario;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,6 +34,10 @@ public class UsuarioEntity {
 
     @Column(name = "senha", nullable = false)
     private String senha;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private StatusUsuario status;
 
     @OneToMany(mappedBy = "usuario")
     private List<VeiculoEntity> veiculos;

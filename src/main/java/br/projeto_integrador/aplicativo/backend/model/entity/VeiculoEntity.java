@@ -1,6 +1,5 @@
 package br.projeto_integrador.aplicativo.backend.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
