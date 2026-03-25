@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class VeiculoEntity {
+public class Veiculo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,9 +19,9 @@ public class VeiculoEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
-    private UsuarioEntity usuario;
+    private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "id_modelo", nullable = false)
-    private ModeloEntity modelo;
+    private Modelo modelo;
 }

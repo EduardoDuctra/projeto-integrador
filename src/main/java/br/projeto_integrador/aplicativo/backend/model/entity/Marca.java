@@ -1,6 +1,5 @@
 package br.projeto_integrador.aplicativo.backend.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,7 @@ import java.util.List;
 @Table(name = "marca")
 @Getter @Setter
 @NoArgsConstructor
-public class MarcaEntity {
+public class Marca {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,5 +25,5 @@ public class MarcaEntity {
     private String pais;
 
     @OneToMany(mappedBy = "marca")
-    private List<ModeloEntity> modelos;
+    private List<Modelo> modelos;
 }

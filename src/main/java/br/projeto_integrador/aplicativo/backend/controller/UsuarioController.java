@@ -2,11 +2,8 @@ package br.projeto_integrador.aplicativo.backend.controller;
 
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCadastroDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
-import br.projeto_integrador.aplicativo.backend.model.entity.UsuarioEntity;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
-import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

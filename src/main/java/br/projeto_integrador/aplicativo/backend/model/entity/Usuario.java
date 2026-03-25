@@ -1,7 +1,6 @@
 package br.projeto_integrador.aplicativo.backend.model.entity;
 
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusUsuario;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.List;
 @Table(name = "usuario")
 @Setter @Getter
 @NoArgsConstructor
-public class UsuarioEntity {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,16 +28,19 @@ public class UsuarioEntity {
     @Column(name = "telefone")
     private String telefone;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = true, unique = true)
     private String email;
 
-    @Column(name = "senha", nullable = false)
+    @Column(name = "senha", nullable = true)
     private String senha;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusUsuario status;
 
+    @Column(name = "cadastro_completo")
+    private boolean cadastroCompleto;
+
     @OneToMany(mappedBy = "usuario")
-    private List<VeiculoEntity> veiculos;
+    private List<Veiculo> veiculos;
 }

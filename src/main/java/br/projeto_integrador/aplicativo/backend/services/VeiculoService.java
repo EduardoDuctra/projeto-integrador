@@ -4,10 +4,10 @@ import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosExcepti
 import br.projeto_integrador.aplicativo.backend.model.dto.MarcaDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.ModeloDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.VeiculoDTO;
-import br.projeto_integrador.aplicativo.backend.model.entity.MarcaEntity;
-import br.projeto_integrador.aplicativo.backend.model.entity.ModeloEntity;
-import br.projeto_integrador.aplicativo.backend.model.entity.UsuarioEntity;
-import br.projeto_integrador.aplicativo.backend.model.entity.VeiculoEntity;
+import br.projeto_integrador.aplicativo.backend.model.entity.Marca;
+import br.projeto_integrador.aplicativo.backend.model.entity.Modelo;
+import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
+import br.projeto_integrador.aplicativo.backend.model.entity.Veiculo;
 import br.projeto_integrador.aplicativo.backend.repositories.ModeloRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.VeiculoRepository;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class VeiculoService {
 
     public VeiculoDTO cadastrarOuAtualizarVeiculoAoUsuario(Long idUsuario, VeiculoDTO dto) {
 
-        UsuarioEntity usuario = usuarioService.buscarPorId(idUsuario);
+        Usuario usuario = usuarioService.buscarPorId(idUsuario);
 
         if(dto.modelo() == null || dto.modelo().idModelo() == null){
             throw new RegraDeNegociosException("Modelo é obrigatório");
@@ -37,16 +37,16 @@ public class VeiculoService {
 
         Long idModelo = dto.modelo().idModelo();
 
-        ModeloEntity modelo = modeloRepository.findById(idModelo).
+        Modelo modelo = modeloRepository.findById(idModelo).
                 orElseThrow(() -> new RegraDeNegociosException("Modelo não encontrado"));
 
 
-        VeiculoEntity veiculo = veiculoRepository.findByUsuario_IdUsuario(idUsuario).orElse(new VeiculoEntity());
+        Veiculo veiculo = veiculoRepository.findByUsuario_IdUsuario(idUsuario).orElse(new Veiculo());
         veiculo.setUsuario(usuario);
         veiculo.setModelo(modelo);
 
 
-        VeiculoEntity salvo = veiculoRepository.save(veiculo);
+        Veiculo salvo = veiculoRepository.save(veiculo);
 
 
         MarcaDTO marcaDTO = new MarcaDTO(
@@ -69,11 +69,11 @@ public class VeiculoService {
 
         usuarioService.buscarPorId(idUsuario);
 
-        VeiculoEntity veiculo = veiculoRepository.findByUsuario_IdUsuario(idUsuario)
+        Veiculo veiculo = veiculoRepository.findByUsuario_IdUsuario(idUsuario)
                 . orElseThrow(() -> new RegraDeNegociosException("Veículo não encontrado para o usuário"));
 
-        ModeloEntity modelo = veiculo.getModelo();
-        MarcaEntity marca = modelo.getMarca();
+        Modelo modelo = veiculo.getModelo();
+        Marca marca = modelo.getMarca();
 
         MarcaDTO marcaDTO = new MarcaDTO(
                 marca.getIdMarca(),

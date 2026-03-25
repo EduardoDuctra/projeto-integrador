@@ -2,7 +2,6 @@ package br.projeto_integrador.aplicativo.backend.model.entity;
 
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoTransacao;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TransacaoEntity {
+public class Transacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,5 +38,5 @@ public class TransacaoEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
-    private UsuarioEntity usuario;
+    private Usuario usuario;
 }

@@ -1,17 +1,15 @@
 package br.projeto_integrador.aplicativo.backend.services;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
+import br.projeto_integrador.aplicativo.backend.model.dto.GoogleUserInfoDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCadastroDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
-import br.projeto_integrador.aplicativo.backend.model.entity.UsuarioEntity;
+import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusUsuario;
 import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,7 @@ public class UsuarioService {
             throw new RegraDeNegociosException("CPF já cadastrado");        }
 
 
-        UsuarioEntity usuario = new UsuarioEntity();
+        Usuario usuario = new Usuario();
         usuario.setNome(dto.nome());
         usuario.setCpf(dto.cpf());
         usuario.setTelefone(dto.telefone());
@@ -45,7 +43,7 @@ public class UsuarioService {
 
         usuario.setSenha(new BCryptPasswordEncoder().encode(dto.senha()));
 
-        UsuarioEntity usuarioSalvo = usuarioRepository.save(usuario);
+        Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
         return new UsuarioDTO(
                 usuarioSalvo.getIdUsuario(),
@@ -55,10 +53,10 @@ public class UsuarioService {
     }
 
     public List<UsuarioDTO> listarUsuarios(){
-        List<UsuarioEntity> usuarios = usuarioRepository.findAll();
+        List<Usuario> usuarios = usuarioRepository.findAll();
         List<UsuarioDTO> listaUsuarios = new ArrayList<>();
 
-        for(UsuarioEntity usuario : usuarios){
+        for(Usuario usuario : usuarios){
 
             if(usuario.getStatus() == StatusUsuario.INATIVO){
                 continue;
@@ -73,7 +71,7 @@ public class UsuarioService {
     }
 
 
-    public UsuarioEntity buscarPorId(Long id) {
+    public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RegraDeNegociosException("Usuário não encontrado"));
     }
@@ -81,7 +79,7 @@ public class UsuarioService {
     @Transactional
     public UsuarioDTO  atualizarUsuario(Long id, UsuarioCadastroDTO dto) {
 
-        UsuarioEntity usuario = null;
+        Usuario usuario = null;
         try {
             usuario = buscarPorId(id);
         } catch (Exception e) {
@@ -101,7 +99,7 @@ public class UsuarioService {
             usuario.setSenha(new BCryptPasswordEncoder().encode(dto.senha()));
         }
 
-        UsuarioEntity atualizado = usuarioRepository.save(usuario);
+        Usuario atualizado = usuarioRepository.save(usuario);
 
         return new UsuarioDTO(
                 atualizado.getIdUsuario(),
@@ -113,7 +111,7 @@ public class UsuarioService {
 
     public void deletarUsuario(Long idUsuario) {
 
-        UsuarioEntity usuario = null;
+        Usuario usuario = null;
         try {
             usuario = buscarPorId(idUsuario);
         } catch (Exception e) {
@@ -126,4 +124,27 @@ public class UsuarioService {
 
 
     }
+
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
+
+    public Usuario usuarioGoogle(GoogleUserInfoDTO dto){
+
+        Usuario usuario = usuarioRepository.findByEmail(dto.email());
+
+        if(usuario == null){
+            usuario = new Usuario();
+            usuario.setEmail(dto.email());
+            usuario.setNome(dto.nome());
+            usuario.setStatus(StatusUsuario.ATIVO);
+            usuario.setCadastroCompleto(false);
+
+
+            usuarioRepository.save(usuario);
+        }
+
+        return usuario;
+    }
+
 }

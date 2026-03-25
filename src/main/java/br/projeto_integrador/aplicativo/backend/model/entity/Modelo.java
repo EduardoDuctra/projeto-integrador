@@ -1,6 +1,5 @@
 package br.projeto_integrador.aplicativo.backend.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ModeloEntity {
+public class Modelo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,5 +22,5 @@ public class ModeloEntity {
 
     @ManyToOne
     @JoinColumn(name = "id_marca", nullable = false)
-    private MarcaEntity marca;
+    private Marca marca;
 }
