@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -37,6 +38,12 @@ public class Usuario {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusUsuario status;
+
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
+    @Column(name = "saldo")
+    private BigDecimal saldo;
 
     @Column(name = "cadastro_completo")
     private boolean cadastroCompleto;

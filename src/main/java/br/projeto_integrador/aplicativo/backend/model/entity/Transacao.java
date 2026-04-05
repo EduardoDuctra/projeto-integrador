@@ -33,7 +33,7 @@ public class Transacao {
     @Column(name = "status_transacao", nullable = false)
     private StatusTransacao statusTransacao;
 
-    @Column(name = "data_transacao", nullable = false)
+    @Column(name = "data", nullable = false)
     private LocalDateTime data;
 
     @ManyToOne

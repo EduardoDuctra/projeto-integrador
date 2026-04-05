@@ -5,6 +5,7 @@ import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,9 +27,20 @@ public class UsuarioController {
 
     }
 
+    @PostMapping("/{id}/foto")
+    public ResponseEntity<String> uploadFoto(@PathVariable Long id,
+            @RequestParam("foto") MultipartFile foto
+    ) {
+
+        String url = usuarioService.atualizarFoto(id, foto);
+
+        return ResponseEntity.status(201).body(url);
+    }
+
+
     @GetMapping("/listar-usuarios")
-    public ResponseEntity<List<UsuarioDTO>>listarUsuarios(){
-        List<UsuarioDTO> usuarios = this.usuarioService.listarUsuarios();
+    public ResponseEntity<List<UsuarioCadastroDTO>>listarUsuarios(){
+        List<UsuarioCadastroDTO> usuarios = this.usuarioService.listarUsuarios();
 
         if(usuarios.isEmpty()){
             return ResponseEntity.status(404).body(usuarios);

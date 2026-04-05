@@ -7,20 +7,27 @@ import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusUsuario;
 import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final Cloudinary cloudinary;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, Cloudinary cloudinary) {
         this.usuarioRepository = usuarioRepository;
+        this.cloudinary = cloudinary;
     }
 
     @Transactional
@@ -31,7 +38,8 @@ public class UsuarioService {
         }
 
         if(usuarioRepository.existsByCpf(dto.cpf())){
-            throw new RegraDeNegociosException("CPF já cadastrado");        }
+            throw new RegraDeNegociosException("CPF já cadastrado");
+        }
 
 
         Usuario usuario = new Usuario();
@@ -40,6 +48,7 @@ public class UsuarioService {
         usuario.setTelefone(dto.telefone());
         usuario.setEmail(dto.email());
         usuario.setStatus(StatusUsuario.ATIVO);
+        usuario.setSaldo(BigDecimal.valueOf(0.0));
 
         usuario.setSenha(new BCryptPasswordEncoder().encode(dto.senha()));
 
@@ -52,21 +61,28 @@ public class UsuarioService {
         );
     }
 
-    public List<UsuarioDTO> listarUsuarios(){
+    public List<UsuarioCadastroDTO> listarUsuarios() {
+
         List<Usuario> usuarios = usuarioRepository.findAll();
-        List<UsuarioDTO> listaUsuarios = new ArrayList<>();
+        List<UsuarioCadastroDTO> listaUsuarios = new ArrayList<>();
 
-        for(Usuario usuario : usuarios){
+        for (Usuario usuario : usuarios) {
 
-            if(usuario.getStatus() == StatusUsuario.INATIVO){
+            if (usuario.getStatus() == StatusUsuario.INATIVO) {
                 continue;
             }
 
-            listaUsuarios.add(new UsuarioDTO(
+            listaUsuarios.add(new UsuarioCadastroDTO(
                     usuario.getIdUsuario(),
                     usuario.getNome(),
-                    usuario.getEmail()));
+                    usuario.getCpf(),
+                    usuario.getTelefone(),
+                    usuario.getEmail(),
+                    null,
+                    usuario.getSaldo()
+            ));
         }
+
         return listaUsuarios;
     }
 
@@ -107,6 +123,46 @@ public class UsuarioService {
                 atualizado.getEmail()
         );
 
+    }
+
+    @Transactional
+    public String atualizarFoto(Long idUsuario, MultipartFile foto) {
+
+        if (foto == null || foto.isEmpty()) {
+            throw new RegraDeNegociosException("Imagem não enviada ou inválida");
+        }
+
+        String contentType = foto.getContentType();
+
+        if (!contentType.equals("image/jpeg") && !contentType.equals("image/png")) {
+            throw new RegraDeNegociosException("Apenas JPG ou PNG são permitidos");
+        }
+
+        long tamanhoMaximo = 2 * 1024 * 1024;
+
+        if (foto.getSize() > tamanhoMaximo) {
+            throw new RegraDeNegociosException("Imagem muito grande (máx 2MB)");
+        }
+
+
+        try {
+            Usuario usuario = buscarPorId(idUsuario);
+
+            Map resultado = cloudinary.uploader().upload(
+                    foto.getBytes(),
+                    ObjectUtils.emptyMap()
+            );
+
+            String url = resultado.get("secure_url").toString();
+
+            usuario.setFotoUrl(url);
+            usuarioRepository.save(usuario);
+
+            return url;
+
+        } catch (Exception e) {
+            throw new RegraDeNegociosException("Erro ao atualizar foto: " + e.getMessage());
+        }
     }
 
     public void deletarUsuario(Long idUsuario) {

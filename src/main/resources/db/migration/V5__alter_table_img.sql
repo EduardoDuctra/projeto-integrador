@@ -1,0 +1,1 @@
+alter table usuario add column foto_url VARCHAR(255)
