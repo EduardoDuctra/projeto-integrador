@@ -1,56 +1,105 @@
 package br.projeto_integrador.aplicativo.backend.ocpp.service;
 
+import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStartDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStopDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.UnlockConnectorDTO;
+import br.projeto_integrador.aplicativo.backend.ocpp.security.OcppTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class OcppClientService {
 
     @Value("${ocpp.api.base-url}")
-    private String baseURL;
+    private String URL_SERVER_OCPP;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+    private final OcppTokenService tokenService;
 
-    // 🔥 coloca seu token aqui
-    private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiamF2YS1jbGllbnQifQ.ZOzg573Zz2Usv9uvuvxa02P-7_hRFRE8aPtm6dpW3EI";
 
-    public String testarConexao() {
-        String url = baseURL + "/remotestart";
+
+    public OcppClientService(RestTemplate restTemplate, OcppTokenService tokenService) {
+        this.restTemplate = restTemplate;
+        this.tokenService = tokenService;
+    }
+
+
+    public String iniciarRecarga(RemoteStartDTO remoteStartDTO) {
+
+        String url = URL_SERVER_OCPP + "/remotestart";
+
+        System.out.println("OCPPService[" + remoteStartDTO.chargerId() + "-" + remoteStartDTO.connectorId() + "] --> remotestart");
+
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + TOKEN); // ✅ ESSENCIAL
 
-        String jsonBody = """
-            {
-                "charger_id": "charger01",
-                "connector_id": 1
-            }
-        """;
+        String token = tokenService.gerarToken();
+        System.out.println("TOKEN GERADO: " + token);
+        headers.set("Authorization", "Bearer " + token);
 
-        HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
 
+        HttpEntity<RemoteStartDTO> request = new HttpEntity<>(remoteStartDTO, headers);
         try {
-            String response = restTemplate.postForObject(url, request, String.class);
-            return "Resposta: " + response;
-        } catch (Exception e) {
-            return "Erro: " + e.getMessage();
+            return  restTemplate.postForObject(url, request, String.class);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+            throw new RegraDeNegociosException("Erro ao publicar em remotestart");
         }
-    }
 
-    public String iniciarRecarga(RemoteStartDTO remoteStartDTO) {
     }
 
     public String pararRecarga(RemoteStopDTO remoteStopDTO) {
+
+        String url = URL_SERVER_OCPP + "/remotestop";
+
+        System.out.println("OCPPService[" + remoteStopDTO.chargerId() + "-" + remoteStopDTO.transactionId() + "] --> remotestop");
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String token = tokenService.gerarToken();
+        System.out.println("TOKEN GERADO: " + token);
+        headers.set("Authorization", "Bearer " + token);
+
+
+        HttpEntity<RemoteStopDTO> request = new HttpEntity<>(remoteStopDTO, headers);
+        try {
+            return  restTemplate.postForObject(url, request, String.class);
+        } catch (RestClientException e) {
+            throw new RegraDeNegociosException("Erro ao publicar em remotestop");
+
+        }
     }
 
     public String desbloquearConector(UnlockConnectorDTO unlockConnectorDTO) {
+
+        String url = URL_SERVER_OCPP + "/unlockconnector";
+
+        System.out.println("OCPPService[" + unlockConnectorDTO.chargerId() + "-" + unlockConnectorDTO.connectorId() + "] --> unlockconnector");
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        String token = tokenService.gerarToken();
+        headers.set("Authorization", "Bearer " + token);
+
+
+        HttpEntity<UnlockConnectorDTO> request = new HttpEntity<>(unlockConnectorDTO, headers);
+        try {
+            return  restTemplate.postForObject(url, request, String.class);
+        } catch (RestClientException e) {
+            throw new RegraDeNegociosException("Erro ao publicar em unlockconnector");
+
+        }
+
     }
 }
