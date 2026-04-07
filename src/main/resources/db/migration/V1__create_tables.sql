@@ -37,7 +37,7 @@ create table veiculo (
                                  references modelo(id_modelo)
 );
 
-create table transacao (
+create table transacaoRecarga (
                            id_transacao bigserial primary key,
                            tipo varchar(50) not null,
                            valor double precision not null,

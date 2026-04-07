@@ -1,0 +1,1 @@
+alter table transacaoRecarga drop column data

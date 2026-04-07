@@ -28,6 +28,17 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+        System.out.println("PATH: " + path);
+
+       //ignora filtro pro que vem do servidor/python
+        //não tem token aqui para receber. apenas para mandar java -> python
+        if (path.contains("/backend")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         System.out.println("Filtro para autenticacao e autorização");
 
         String tokenJWT = recuperarToken(request);
@@ -39,18 +50,21 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
                 System.out.println("Login: " + subject);
 
                 UserDetails userDetails = this.autenticacaoService.loadUserByUsername(subject);
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
             } catch (RuntimeException e) {
                 System.out.println("Token inválido ou expirado: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return; // interrompe a requisição
+                return;
             }
         }
 
+        // segue fluxo normal
         filterChain.doFilter(request, response);
-
     }
 
     private String recuperarToken(HttpServletRequest request) {

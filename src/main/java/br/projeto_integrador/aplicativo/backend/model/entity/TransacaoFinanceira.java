@@ -11,16 +11,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "transacao")
+@Table(name = "transacao_financeira")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Transacao {
+public class TransacaoFinanceira {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_transacao")
-    private Long idTransacao;
+    @Column(name = "id_transacao_financeira")
+    private Long idTransacaoFinanceira;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
@@ -30,13 +30,19 @@ public class Transacao {
     private BigDecimal valor;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status_transacao", nullable = false)
+    @Column(name = "status_transacao_financeira", nullable = false)
     private StatusTransacao statusTransacao;
+
 
     @Column(name = "data", nullable = false)
     private LocalDateTime data;
 
+
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "id_sessao_recarga", nullable = false)
+    private TransacaoRecarga transacaoRecarga;
 }

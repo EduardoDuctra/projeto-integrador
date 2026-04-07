@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/usuario/**").permitAll()
                         .requestMatchers("/login/google").permitAll()
                         .requestMatchers("/carregador").permitAll()
+                        .requestMatchers("/backend/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

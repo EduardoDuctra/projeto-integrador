@@ -1,7 +1,6 @@
 package br.projeto_integrador.aplicativo.backend.ocpp.controller;
 
 
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStartDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStopDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.UnlockConnectorDTO;
