@@ -1,6 +1,6 @@
 package br.projeto_integrador.aplicativo.backend.model.enums;
 
-public enum Status {
+public enum StatusCarregador {
 
     DISPONIVEL, OCUPADO, DESATIVADO
 }

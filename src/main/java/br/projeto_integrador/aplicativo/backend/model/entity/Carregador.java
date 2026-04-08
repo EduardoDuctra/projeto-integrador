@@ -1,7 +1,7 @@
 package br.projeto_integrador.aplicativo.backend.model.entity;
 
 
-import br.projeto_integrador.aplicativo.backend.model.enums.Status;
+import br.projeto_integrador.aplicativo.backend.model.enums.StatusCarregador;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,9 +16,8 @@ public class Carregador {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_carregador")
-    private Long idCarregador;
+    private String idCarregador;
 
 
     @Column(name = "numero_serie")
@@ -41,11 +40,11 @@ public class Carregador {
 
     @Column(name = "status_carregador")
     @Enumerated(EnumType.STRING)
-    private Status statusCarregador;
+    private StatusCarregador statusCarregador;
 
 
     @ManyToOne
-    @JoinColumn(name = "id_eletroposto", nullable = false)
+    @JoinColumn(name = "id_eletroposto", nullable = true)
     private Eletroposto eletroposto;
 
 }

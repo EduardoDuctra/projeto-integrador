@@ -1,6 +1,7 @@
 package br.projeto_integrador.aplicativo.backend.model.entity;
 
-import br.projeto_integrador.aplicativo.backend.model.enums.Status;
+import br.projeto_integrador.aplicativo.backend.model.enums.StatusCarregador;
+import br.projeto_integrador.aplicativo.backend.model.enums.StatusEletroposto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +34,7 @@ public class Eletroposto {
 
     @Column(name = "status_eletroposto")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private StatusEletroposto statusEletroposto;
 
 
 }
