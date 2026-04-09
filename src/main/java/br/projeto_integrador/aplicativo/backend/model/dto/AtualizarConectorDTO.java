@@ -1,4 +1,10 @@
 package br.projeto_integrador.aplicativo.backend.model.dto;
 
-public class AtualizarConectorDTO {
+import br.projeto_integrador.aplicativo.backend.model.enums.TipoCarregador;
+
+public record AtualizarConectorDTO(
+        String charger_id,
+        Integer connector_id,
+        TipoCarregador tipoCarregador
+) {
 }

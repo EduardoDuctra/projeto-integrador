@@ -1,6 +1,6 @@
-package br.projeto_integrador.aplicativo.backend.ocpp;
+package br.projeto_integrador.aplicativo.backend.model.enums;
 
-public enum EnumStatusNotification {
+public enum StatusNotification {
 
     Available,
     Charging,

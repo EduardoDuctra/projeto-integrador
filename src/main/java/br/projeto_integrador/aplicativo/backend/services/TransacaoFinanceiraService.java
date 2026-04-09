@@ -23,16 +23,14 @@ public class TransacaoFinanceiraService {
     private final TransacaoFinanceiraRepository transacaoFinanceiraRepository;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
-    private final ConectorService conectorService;
 
 
 
-    public TransacaoFinanceiraService(TransacaoFinanceiraRepository transacaoFinanceiraRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService, ConectorService conectorService) {
+    public TransacaoFinanceiraService(TransacaoFinanceiraRepository transacaoFinanceiraRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService) {
 
         this.transacaoFinanceiraRepository = transacaoFinanceiraRepository;
         this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
-        this.conectorService = conectorService;
     }
 
 

@@ -1,0 +1,19 @@
+Recebido heartbeat:
+{charger_id=Voltta_15, heartbeat=2026-04-09T11:32:33Z}
+
+
+Recebido meterValues:
+{charger_id=Voltta_15, connector_id=1, transaction_id=5697942, meter_value=[{sampled_value=[{unit=A, context=Sample.Periodic, measurand=Current.Import, phase=L1, value=125}, {unit=Wh, context=Sample.Periodic, format=Raw, measurand=Energy.Active.Import.Register, location=Outlet, value=9577}, {unit=W, context=Sample.Periodic, measurand=Power.Active.Import, value=48000}, {unit=Percent, context=Sample.Periodic, measurand=SoC, location=EV, value=62.0}, {unit=V, context=Sample.Periodic, measurand=Voltage, phase=L1, value=384}], timestamp=2026-04-09T11:32:16.025857Z}]}
+
+
+Recebido BootNotification:
+BootNotificationDTO[charger_id=Voltta_15, charge_point_vendor=Emobility Voltta, charge_point_model=Voltta Charger, charge_box_serial_number=CBX-24A1Z0-00123, charge_point_serial_number=CP-ABBEVC-00123, firmware_version=v1.2.4-build-0925, iccid=8945001202234567890]
+
+
+
+Recebido StatusNotification:
+{charger_id=Voltta_15, connector_id=1, error_code=NoError, status=Available, timestamp=None, info=None, vendor_id=None, vendor_error_code=None}
+
+
+
+MeterValuesCompletoDTO[charger_id=Voltta_15, connector_id=1, transaction_id=1305334, meter_value=[MeterValueDTO[sampled_value=[SampledValueDTO[unit=A, context=Transaction.Begin, measurand=Current.Import, phase=L1, location=null, format=null, value=0.0], SampledValueDTO[unit=Wh, context=Transaction.Begin, measurand=Energy.Active.Import.Register, phase=null, location=Outlet, format=Raw, value=0.0], SampledValueDTO[unit=W, context=Transaction.Begin, measurand=Power.Active.Import, phase=null, location=null, format=null, value=0.0], SampledValueDTO[unit=Percent, context=Transaction.Begin, measurand=SoC, phase=null, location=EV, format=null, value=50.0], SampledValueDTO[unit=V, context=Transaction.Begin, measurand=Voltage, phase=L1, location=null, format=null, value=0.0]], timestamp=2026-04-09T11:58:57.818981Z]]]
