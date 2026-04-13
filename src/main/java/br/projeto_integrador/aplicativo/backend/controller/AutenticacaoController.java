@@ -84,4 +84,20 @@ public class AutenticacaoController {
 
         return ResponseEntity.ok(usuarioDTO);
     }
+
+    @PostMapping("/esqueci-senha")
+    public ResponseEntity<String> esqueciSenha(@RequestBody EsqueciSenhaDTO dto) {
+        usuarioService.enviarCodigoRecuperacao(dto.email());
+        return ResponseEntity.ok("Código enviado");
+    }
+
+
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<String> redefinirSenha(@RequestBody NovaSenhaDTO dto) {
+
+        usuarioService.redefinirSenha(dto.email(), dto.codigo(), dto.novaSenha());
+
+        return ResponseEntity.ok("Senha atualizada");
+    }
+
 }

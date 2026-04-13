@@ -29,8 +29,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/usuario/**").permitAll()
+                        .requestMatchers("/login/**").permitAll()                        .requestMatchers("/usuario/**").permitAll()
                         .requestMatchers("/login/google").permitAll()
                         .requestMatchers("/carregador").permitAll()
                         .requestMatchers("/backend/**").permitAll()

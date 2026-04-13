@@ -1,6 +1,7 @@
 package br.projeto_integrador.aplicativo.backend.services;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
+import br.projeto_integrador.aplicativo.backend.model.CodigoRecuperacao;
 import br.projeto_integrador.aplicativo.backend.model.dto.GoogleUserInfoDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCadastroDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
@@ -15,19 +16,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final Cloudinary cloudinary;
+    private final EmailService emailService;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, Cloudinary cloudinary) {
+    public UsuarioService(UsuarioRepository usuarioRepository, Cloudinary cloudinary, EmailService emailService) {
         this.usuarioRepository = usuarioRepository;
         this.cloudinary = cloudinary;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -181,9 +183,7 @@ public class UsuarioService {
 
     }
 
-    public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email);
-    }
+
 
     public Usuario usuarioGoogle(GoogleUserInfoDTO dto){
 
@@ -203,4 +203,55 @@ public class UsuarioService {
         return usuario;
     }
 
+
+    private Map<String, CodigoRecuperacao> codigos = new HashMap<>();
+
+    public void enviarCodigoRecuperacao(String email) {
+
+        Usuario usuario = usuarioRepository.findByEmail(email);
+
+        if (usuario == null) {
+            throw new RegraDeNegociosException("Usuário não encontrado");
+        }
+
+        String codigo = String.format("%06d", new Random().nextInt(1000000));
+
+        CodigoRecuperacao codigoRecuperacao = new CodigoRecuperacao();
+        codigoRecuperacao.setCodigo(codigo);
+        codigoRecuperacao.setValidade(LocalDateTime.now().plusMinutes(10));
+
+        codigos.put(email, codigoRecuperacao);
+
+        emailService.enviar(email,
+                "Recuperação de senha",
+                "Seu código de recuperação é: " + codigo + "\n\nEle expira em 10 minutos.");
+
+        System.out.println("Código enviado: " + codigo);
+    }
+
+    public void redefinirSenha(String email, String codigo, String novaSenha) {
+
+        CodigoRecuperacao codigoRecuperacao = codigos.get(email);
+
+        if(codigoRecuperacao == null){
+            throw new RegraDeNegociosException("Código não encontrado");
+        }
+
+        if (!codigoRecuperacao.getCodigo().equals(codigo)) {
+            throw new RegraDeNegociosException("Código inválido");
+        }
+
+
+        if (codigoRecuperacao.getValidade().isBefore(LocalDateTime.now())) {
+            throw new RegraDeNegociosException("Código expirado");
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(email);
+        usuario.setSenha(new BCryptPasswordEncoder().encode(novaSenha));
+        usuarioRepository.save(usuario);
+
+        codigos.remove(email);
+
+
+    }
 }
