@@ -42,9 +42,11 @@ public class Carregador {
     @Enumerated(EnumType.STRING)
     private StatusCarregador statusCarregador;
 
+    @Column(name = "cidade")
+    private String cidade;
 
-    @ManyToOne
-    @JoinColumn(name = "id_eletroposto", nullable = true)
-    private Eletroposto eletroposto;
+    @Column(name = "endereco")
+    private String endereco;
+
 
 }

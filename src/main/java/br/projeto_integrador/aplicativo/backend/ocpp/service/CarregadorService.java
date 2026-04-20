@@ -3,26 +3,20 @@ package br.projeto_integrador.aplicativo.backend.ocpp.service;
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarCarregadorDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Carregador;
-import br.projeto_integrador.aplicativo.backend.model.entity.Eletroposto;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.BootNotificationDTO;
 import br.projeto_integrador.aplicativo.backend.repositories.CarregadorRepository;
-import br.projeto_integrador.aplicativo.backend.repositories.EletropostoRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class CarregadorService {
 
     private final CarregadorRepository carregadorRepository;
-    private final EletropostoRepository eletropostoRepository;
 
-    public CarregadorService(CarregadorRepository carregadorRepository, EletropostoRepository eletropostoRepository) {
+    public CarregadorService(CarregadorRepository carregadorRepository) {
         this.carregadorRepository = carregadorRepository;
-        this.eletropostoRepository = eletropostoRepository;
     }
 
+    //vem direto do OCPP
     public void processarCarregador(BootNotificationDTO payload){
 
         String idCharger = payload.charger_id();
@@ -72,6 +66,7 @@ public class CarregadorService {
     }
 
 
+    //endpoint para atualizar manualmente
     public String atualizarInformacoes(AtualizarCarregadorDTO dto) {
 
         if(dto.idCarregador() == null){
@@ -89,13 +84,15 @@ public class CarregadorService {
             carregador.setPotenciaCorrenteContinua(dto.potenciaCorrenteContinua());
         }
 
-        if(dto.idEletroposto()!=null){
-
-            Eletroposto eletroposto = eletropostoRepository.findById(dto.idEletroposto())
-                    .orElseThrow(() -> new RegraDeNegociosException("Eletroposto não encontrado"));
-
-            carregador.setEletroposto(eletroposto);
+        if(dto.cidade() != null){
+            carregador.setCidade(dto.cidade());
         }
+
+        if (dto.endereco() != null){
+            carregador.setEndereco(dto.endereco());
+        }
+
+
 
         carregadorRepository.save(carregador);
 

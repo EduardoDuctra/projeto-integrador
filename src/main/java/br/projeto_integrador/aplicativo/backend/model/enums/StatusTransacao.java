@@ -4,5 +4,12 @@ public enum StatusTransacao {
 
     APROVADA,
     REPROVADA,
-    CONCLUIDA
+    CONCLUIDA,
+
+    Available,
+    Charging,
+    Preparing,
+    Finishing,
+    Unavailable
+
 }

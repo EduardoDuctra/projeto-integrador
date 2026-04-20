@@ -17,11 +17,18 @@ public class Veiculo {
     @Column(name = "id_veiculo")
     private Long idVeiculo;
 
+    @Column(name = "modelo_carro")
+    private String modeloCarro;
+
+    @Column(name = "nome_marca")
+    private String nomeMarca;
+
+
+
     @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "id_modelo", nullable = false)
-    private Modelo modelo;
+
 }
+

@@ -7,26 +7,33 @@ import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStopDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.UnlockConnectorDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.CarregadorService;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.OcppClientService;
+import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+//envia os dados para o servidor
 @RestController
 @RequestMapping("/carregador")
 public class CarregadorController {
 
     private final OcppClientService ocppClientService;
     private final CarregadorService carregadorService;
+    private final SecurityUtils securityUtils;
 
-    public CarregadorController(OcppClientService ocppClientService, CarregadorService carregadorService) {
+    public CarregadorController(OcppClientService ocppClientService, CarregadorService carregadorService, SecurityUtils securityUtils) {
         this.ocppClientService = ocppClientService;
         this.carregadorService = carregadorService;
+        this.securityUtils = securityUtils;
     }
 
     //python retorna uma string
     @PostMapping("/remotestart")
-    public ResponseEntity<String> remoteStart(@RequestBody RemoteStartDTO remoteStartDTO) {
+    public ResponseEntity<String> remoteStart(HttpServletRequest request,
+                                              @RequestBody RemoteStartDTO remoteStartDTO) {
 
-        String response = ocppClientService.iniciarRecarga(remoteStartDTO);
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
+        String response = ocppClientService.iniciarRecarga(id, remoteStartDTO);
 
         return ResponseEntity.status(200).body(response);
 

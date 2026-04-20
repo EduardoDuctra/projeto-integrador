@@ -1,11 +1,12 @@
 package br.projeto_integrador.aplicativo.backend.ocpp.controller;
 
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.BootNotificationDTO;
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.HeartbeatDTO;
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValuesCompletoDTO;
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.StatusNotificationDTO;
+import br.projeto_integrador.aplicativo.backend.ocpp.dto.*;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.CarregadorService;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.ConectorService;
+import br.projeto_integrador.aplicativo.backend.ocpp.service.OcppClientService;
+import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
+import br.projeto_integrador.aplicativo.backend.services.TransacaoService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,17 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 
-//é essa classe que entra o servidor em python
+//é essa classe que entra os dados servidor em python
 @RestController
 @RequestMapping("/backend")
 public class GatewayController {
 
     private final CarregadorService carregadorService;
     private final ConectorService conectorService;
+    private final TransacaoService transacaoService;
 
-    public GatewayController(CarregadorService carregadorService, ConectorService conectorService) {
+
+    public GatewayController(CarregadorService carregadorService, ConectorService conectorService, TransacaoService transacaoService, SecurityUtils securityUtils, OcppClientService ocppClientService) {
         this.carregadorService = carregadorService;
         this.conectorService = conectorService;
+        this.transacaoService = transacaoService;
     }
 
     //info do carregador
@@ -73,7 +77,20 @@ public class GatewayController {
         System.out.println(payload);
 
         conectorService.processarMeterValues(payload);
+        transacaoService.processarMeterValuesCiclo(payload);
 
         return ResponseEntity.ok().build();
     }
+
+
+    //todo DTO
+    @PostMapping("/startTransaction")
+    public ResponseEntity<Void> startTransaction(@RequestBody Map<String, Object> payload) {
+
+        System.out.println("Recebido StartTransaction:");
+        System.out.println(payload);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

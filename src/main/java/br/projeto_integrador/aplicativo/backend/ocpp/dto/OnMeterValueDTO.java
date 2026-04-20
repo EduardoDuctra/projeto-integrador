@@ -12,7 +12,7 @@ public record OnMeterValueDTO(
         Integer connectorId,
 
         @JsonProperty("transaction_id")
-        Long transactionId,
+        Integer transactionId,
 
         @JsonProperty("meter_value")
         Map<String, Object> meterValue

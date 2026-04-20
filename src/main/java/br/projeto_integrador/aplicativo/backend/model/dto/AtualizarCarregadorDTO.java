@@ -4,7 +4,7 @@ public record AtualizarCarregadorDTO(
         String idCarregador,
         Double potenciaCorrenteContinua,
         Double potenciaCorrenteAlternada,
-        Long idEletroposto
-
+        String cidade,
+        String endereco
 ) {
 }

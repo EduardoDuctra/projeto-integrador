@@ -1,12 +1,13 @@
 package br.projeto_integrador.aplicativo.backend.services;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
+import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarValorMaximoDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoFinanceiraDTO;
-import br.projeto_integrador.aplicativo.backend.model.entity.TransacaoFinanceira;
+import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoTransacao;
-import br.projeto_integrador.aplicativo.backend.repositories.TransacaoFinanceiraRepository;
+import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -20,15 +21,15 @@ import java.util.List;
 public class TransacaoFinanceiraService {
 
 
-    private final TransacaoFinanceiraRepository transacaoFinanceiraRepository;
+    private final TransacaoRepository transacaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
 
 
 
-    public TransacaoFinanceiraService(TransacaoFinanceiraRepository transacaoFinanceiraRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService) {
+    public TransacaoFinanceiraService(TransacaoRepository transacaoRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService) {
 
-        this.transacaoFinanceiraRepository = transacaoFinanceiraRepository;
+        this.transacaoRepository = transacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
     }
@@ -40,129 +41,81 @@ public class TransacaoFinanceiraService {
      * @return
      */
     @Transactional
-    public TransacaoFinanceiraDTO criarTransacao(TransacaoFinanceiraDTO dto) {
+    public TransacaoFinanceiraDTO criarTransacao(Long idUsuario, TransacaoFinanceiraDTO dto) {
 
-        if (dto.valor() == null) {
+        if (dto.valorRecarga() == null) {
             throw new RegraDeNegociosException("Valor não pode ser nulo");
         }
 
-        Usuario usuario = usuarioService.buscarPorId(dto.idUsuario());
 
-        TransacaoFinanceira transacaoFinanceira = new TransacaoFinanceira();
+        Usuario usuario = usuarioService.buscarPorId(idUsuario);
+
+        Transacao transacaoFinanceira = new Transacao();
 
 
-        if (dto.data() != null) {
-            transacaoFinanceira.setData(dto.data());
-        } else {
-            transacaoFinanceira.setData(LocalDateTime.now());
+        transacaoFinanceira.setDataInicio(LocalDateTime.now());
+
+
+        if(dto.valorRecarga() != null) {
+            transacaoFinanceira.setTipoTransacao(TipoTransacao.CREDITO);
+            transacaoFinanceira.setStatusTransacao(StatusTransacao.APROVADA);
+            transacaoFinanceira.setValorRecarga(dto.valorRecarga());
         }
 
-        if (dto.statusTransacao() == null ||
-                dto.statusTransacao() != StatusTransacao.REPROVADA && dto.statusTransacao() != StatusTransacao.APROVADA) {
-
-            throw new RegraDeNegociosException("Status incorreto");
-        }
-
-        if (dto.tipoTransacao() == null || dto.tipoTransacao() != TipoTransacao.CREDITO) {
-
-            throw new RegraDeNegociosException("Tipo transacao incorreto");
-
-        }
-
-        transacaoFinanceira.setValor(dto.valor());
         transacaoFinanceira.setUsuario(usuario);
-        transacaoFinanceira.setTipoTransacao(dto.tipoTransacao());
-        transacaoFinanceira.setStatusTransacao(dto.statusTransacao());
 
-
-        BigDecimal saldoUsuario = usuario.getSaldo().add(dto.valor());
+        BigDecimal saldoUsuario = usuario.getSaldo().add(dto.valorRecarga());
         usuario.setSaldo(saldoUsuario);
-
 
 
         usuarioRepository.save(usuario);
 
 
-        TransacaoFinanceira salva = transacaoFinanceiraRepository.save(transacaoFinanceira);
+        Transacao salva = transacaoRepository.save(transacaoFinanceira);
 
         return new TransacaoFinanceiraDTO(
-                salva.getIdTransacaoFinanceira(),
-                salva.getTipoTransacao(),
-                salva.getValor(),
-                salva.getStatusTransacao(),
-                salva.getData(),
-                salva.getUsuario().getIdUsuario(),
-                null
+                salva.getValorRecarga(),
+                salva.getDataInicio()
         );
     }
 
 
 
-    //todo -> atualizar conforme valor gasto
-    //todo -> estimar recarga
-    @Transactional
-    public TransacaoFinanceiraDTO atualizarTransacao(Long id, TransacaoFinanceiraDTO dto) {
 
-        TransacaoFinanceira transacaoRecarga = transacaoFinanceiraRepository.findById(id)
+
+    @Transactional
+    public AtualizarValorMaximoDTO atualizarTransacao(Long idUsuario, Long idTransacao, BigDecimal valorMaximo) {
+
+        Transacao transacao = transacaoRepository
+                .findByIdTransacao(idTransacao)
                 .orElseThrow(() -> new RegraDeNegociosException("Transação não encontrada"));
 
-        if (dto.idUsuario() != null) {
-            Usuario usuario = usuarioService.buscarPorId(dto.idUsuario());
 
-            transacaoRecarga.setUsuario(usuario);
-
-            //atualizo o saldo depois do fim
-            //todo -> verificar se tem saldo suficiente antes de iniciar
-            // todo -> alterar status para concluido (ver codigo adicional)
-            if (dto.tipoTransacao() == TipoTransacao.CREDITO) {
-                BigDecimal saldoUsuario = usuario.getSaldo().add(dto.valor());
-                usuario.setSaldo(saldoUsuario);
-            } else if (dto.tipoTransacao() == TipoTransacao.DEBITO) {
-                BigDecimal saldoUsuario = usuario.getSaldo().subtract(dto.valor());
-                usuario.setSaldo(saldoUsuario);
-            }
+        if (!transacao.getUsuario().getIdUsuario().equals(idUsuario)) {
+            throw new RegraDeNegociosException("Usuário não autorizado");
         }
 
-        if (dto.valor() != null) {
-            transacaoRecarga.setValor(dto.valor());
+        if (valorMaximo == null || valorMaximo.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RegraDeNegociosException("Valor máximo inválido");
         }
 
-        if (dto.tipoTransacao() != null) {
-            transacaoRecarga.setTipoTransacao(dto.tipoTransacao());
-        }
-
-        if (dto.statusTransacao() != null) {
-            transacaoRecarga.setStatusTransacao(dto.statusTransacao());
-        }
+        transacao.setValorMaximo(valorMaximo);
 
 
-        if (dto.statusTransacao() == StatusTransacao.CONCLUIDA &&
-                transacaoRecarga.getStatusTransacao() != StatusTransacao.CONCLUIDA) {
+        transacaoRepository.save(transacao);
 
-            transacaoRecarga.setData(LocalDateTime.now());
-        }
 
-        TransacaoFinanceira salva = transacaoFinanceiraRepository.save(transacaoRecarga);
-
-        //todo transacao recarga  -> listar tb
-
-        return new TransacaoFinanceiraDTO(
-                salva.getIdTransacaoFinanceira(),
-                salva.getTipoTransacao(),
-                salva.getValor(),
-                salva.getStatusTransacao(),
-                salva.getData(),
-                salva.getUsuario().getIdUsuario(),
-                null
-        );
+        return new AtualizarValorMaximoDTO(valorMaximo);
     }
+
+
 
 
     public List<TransacaoFinanceiraDTO> listarPorUsuario(Long idUsuario) {
 
         usuarioService.buscarPorId(idUsuario);
 
-        List<TransacaoFinanceira> transacoes = transacaoFinanceiraRepository.findByUsuarioIdUsuario(idUsuario);
+        List<Transacao> transacoes = transacaoRepository.findByUsuarioIdUsuario(idUsuario);
 
         if (transacoes.isEmpty()) {
             throw new RegraDeNegociosException("Nenhuma transação encontrada para o usuário");
@@ -170,19 +123,19 @@ public class TransacaoFinanceiraService {
 
         List<TransacaoFinanceiraDTO> listaDTO = new ArrayList<>();
 
-        for (TransacaoFinanceira transacaoFinanceira : transacoes) {
+        for (Transacao transacaoFinanceira : transacoes) {
 
-            TransacaoFinanceiraDTO dto = new TransacaoFinanceiraDTO(
-                    transacaoFinanceira.getIdTransacaoFinanceira(),
-                    transacaoFinanceira.getTipoTransacao(),
-                    transacaoFinanceira.getValor(),
-                    transacaoFinanceira.getStatusTransacao(),
-                    transacaoFinanceira.getData(),
-                    transacaoFinanceira.getUsuario().getIdUsuario(),
-                    null
-            );
+            if(transacaoFinanceira.getTipoTransacao().equals(TipoTransacao.CREDITO)) {
 
-            listaDTO.add(dto);
+                TransacaoFinanceiraDTO dto = new TransacaoFinanceiraDTO(
+                        transacaoFinanceira.getValorRecarga(),
+                        transacaoFinanceira.getDataInicio()
+                );
+
+                listaDTO.add(dto);
+
+            }
+
         }
 
         return listaDTO;

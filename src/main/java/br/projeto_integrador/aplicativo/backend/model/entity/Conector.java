@@ -1,8 +1,9 @@
 package br.projeto_integrador.aplicativo.backend.model.entity;
 
 
+import br.projeto_integrador.aplicativo.backend.model.enums.NomeConector;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusNotification;
-import br.projeto_integrador.aplicativo.backend.model.enums.TipoCarregador;
+import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Conector {
 
+
     //id no banco
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +31,7 @@ public class Conector {
 
     @Column(name = "tipo_conector")
     @Enumerated(EnumType.STRING)
-    private TipoCarregador tipo;
+    private TipoConector tipo;
 
     @Column(name = "em_uso")
     private boolean emUso;
@@ -45,6 +47,14 @@ public class Conector {
     @Column(name = "data_ultima_atualizacao")
     private LocalDateTime dataAtualizacao;
 
+
+    @Column(name = "nome_conector")
+    @Enumerated(EnumType.STRING)
+    private NomeConector nomeConector;
+
+
+    @Column(name = "valor_energia")
+    private Double valorEnergia;
 
     @ManyToOne
     @JoinColumn(name = "id_carregador", nullable = false)

@@ -2,7 +2,9 @@ package br.projeto_integrador.aplicativo.backend.controller;
 
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCadastroDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
+import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +16,11 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final SecurityUtils securityUtils;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, SecurityUtils securityUtils) {
         this.usuarioService = usuarioService;
+        this.securityUtils = securityUtils;
     }
 
     @PostMapping
@@ -27,11 +31,12 @@ public class UsuarioController {
 
     }
 
-    @PostMapping("/{id}/foto")
-    public ResponseEntity<String> uploadFoto(@PathVariable Long id,
-            @RequestParam("foto") MultipartFile foto
+    @PostMapping("/logado/foto")
+    public ResponseEntity<String> uploadFoto(HttpServletRequest request,
+                                             @RequestParam("foto") MultipartFile foto
     ) {
 
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
         String url = usuarioService.atualizarFoto(id, foto);
 
         return ResponseEntity.status(201).body(url);
@@ -49,19 +54,21 @@ public class UsuarioController {
     }
 
 
-    @PutMapping("/atualizar/{id}")
-    public ResponseEntity<UsuarioDTO> atualizarUsuario(
-            @PathVariable Long id,
-            @RequestBody UsuarioCadastroDTO dto) {
+    @PutMapping("/atualizar/logado")
+    public ResponseEntity<UsuarioDTO> atualizarUsuario(HttpServletRequest request,
+                                                       @RequestBody UsuarioCadastroDTO dto) {
 
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
         UsuarioDTO atualizado = usuarioService.atualizarUsuario(id, dto);
 
         return ResponseEntity.ok(atualizado);
     }
 
-    @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
 
+    @DeleteMapping("/deletar/logado")
+    public ResponseEntity<Void> deletarUsuario(HttpServletRequest request) {
+
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
         usuarioService.deletarUsuario(id);
 
         return ResponseEntity.noContent().build();

@@ -1,8 +1,10 @@
 package br.projeto_integrador.aplicativo.backend.controller;
 
 import br.projeto_integrador.aplicativo.backend.model.dto.VeiculoDTO;
+import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
 import br.projeto_integrador.aplicativo.backend.services.VeiculoService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,27 +13,29 @@ import org.springframework.web.bind.annotation.*;
 public class VeiculoController {
 
     private final VeiculoService service;
-    private final UsuarioService usuarioService;
+    private final SecurityUtils securityUtils;
 
     public VeiculoController(VeiculoService service,
-                             UsuarioService usuarioService) {
+                             UsuarioService usuarioService, SecurityUtils securityUtils) {
         this.service = service;
-        this.usuarioService = usuarioService;
+        this.securityUtils = securityUtils;
     }
 
 
-    @PostMapping("/cadastrar/{idUsuario}")
-    public ResponseEntity<VeiculoDTO> cadastraOuAtualizarVeiculoAoUsuario(@PathVariable Long idUsuario, @RequestBody VeiculoDTO dto) {
+    @PostMapping("/cadastrar")
+    public ResponseEntity<VeiculoDTO> cadastraOuAtualizarVeiculoAoUsuario(HttpServletRequest request, @RequestBody VeiculoDTO dto) {
 
-        VeiculoDTO veiculo = service.cadastrarOuAtualizarVeiculoAoUsuario(idUsuario, dto);
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
+        VeiculoDTO veiculo = service.cadastrarOuAtualizarVeiculoAoUsuario(id, dto);
 
         return ResponseEntity.status(201).body(veiculo);
 
     }
 
-    @GetMapping("/listar/{id}")
-    public ResponseEntity<VeiculoDTO>listarVeiculoPorUsuario(@PathVariable Long id) {
+    @GetMapping("/listar")
+    public ResponseEntity<VeiculoDTO>listarVeiculoPorUsuario(HttpServletRequest request) {
 
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
         VeiculoDTO veiculo = service.listarVeiculoUsuario(id);
 
         return ResponseEntity.status(201).body(veiculo);

@@ -1,12 +1,11 @@
 package br.projeto_integrador.aplicativo.backend.ocpp.service;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
-import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarCarregadorDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarConectorDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Carregador;
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
-import br.projeto_integrador.aplicativo.backend.model.entity.Eletroposto;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusNotification;
+import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValueDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValuesCompletoDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.SampledValueDTO;
@@ -67,6 +66,7 @@ public class ConectorService {
         }
         else {
             conector.setEmUso(false);
+            conector.setSocRecarga(0.0);
         }
 
 
@@ -123,8 +123,14 @@ public class ConectorService {
                 .findByCarregador_IdCarregadorAndConnectorIdNoCarregador(dto.charger_id(), dto.connector_id())
                 .orElseThrow(() -> new RuntimeException("Conector não encontrado"));
 
-        if (dto.tipoCarregador() != null){
-            conector.setTipo(dto.tipoCarregador());
+        if (dto.tipoConector() != null){
+            conector.setTipo(dto.tipoConector());
+            conector.setValorEnergia(dto.tipoConector().getValorKwh());
+
+        }
+
+        if(dto.nomeConector() != null){
+            conector.setNomeConector(dto.nomeConector());
         }
 
 

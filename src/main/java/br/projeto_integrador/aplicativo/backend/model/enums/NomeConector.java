@@ -1,5 +1,6 @@
 package br.projeto_integrador.aplicativo.backend.model.enums;
 
-public enum StatusEletroposto {
-    ATIVO, DESATIVADO
+public enum NomeConector {
+    TYPE2,
+    CCS2
 }
