@@ -54,6 +54,9 @@ public class GatewayController {
 
         conectorService.processarConector(payload);
 
+        //para ver se tem um CC sendo utilizado -> outro fica indisponível
+        conectorService.atualizarDisponivelUsoCC(payload.charger_id());
+
         return ResponseEntity.ok().build();
     }
 

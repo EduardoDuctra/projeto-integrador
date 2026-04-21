@@ -14,6 +14,8 @@ import br.projeto_integrador.aplicativo.backend.repositories.CarregadorRepositor
 import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ConectorService {
 
@@ -62,10 +64,10 @@ public class ConectorService {
         }
 
         if(payload.status() != StatusNotification.Available){
-            conector.setEmUso(true);
+            conector.setDisponivelUso(false);
         }
         else {
-            conector.setEmUso(false);
+            conector.setDisponivelUso(true);
             conector.setSocRecarga(0.0);
         }
 
@@ -141,5 +143,64 @@ public class ConectorService {
 
         return response;
 
+    }
+
+
+    //retorna TRUE se tiver um CC ativo
+    public boolean existeCCCarregando(String idCarregador) {
+
+        List<Conector> conectores = conectorRepository
+                .findByCarregador_IdCarregador(idCarregador);
+
+        for (Conector conector : conectores) {
+
+            if (conector.getTipo() == TipoConector.CC &&
+                    conector.getStatusConcetor() == StatusNotification.Charging) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void atualizarDisponivelUsoCC(String idCarregador) {
+
+        List<Conector> conectores = conectorRepository
+                .findByCarregador_IdCarregador(idCarregador);
+
+        boolean existeCCCarregando = false;
+
+        //  verifica se existe CC carregando
+        for (Conector conector : conectores) {
+            if (conector.getTipo() == TipoConector.CC &&
+                    conector.getStatusConcetor() == StatusNotification.Charging) {
+
+                existeCCCarregando = true;
+                break;
+            }
+        }
+
+
+        for (Conector conector : conectores) {
+
+            if (conector.getTipo() == TipoConector.CC) {
+
+                if (conector.getStatusConcetor() == StatusNotification.Charging) {
+                    // está sendo usado -> indisponível
+                    conector.setDisponivelUso(false);
+
+                } else if (existeCCCarregando) {
+                    // outro CC está sendo usado -> indisponível
+                    conector.setDisponivelUso(false);
+
+                } else {
+
+                    conector.setDisponivelUso(true);
+                }
+
+                conectorRepository.save(conector);
+            }
+        }
     }
 }

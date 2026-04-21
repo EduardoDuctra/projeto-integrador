@@ -5,6 +5,7 @@ import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
+import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoTransacao;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStartDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStopDTO;
@@ -35,15 +36,17 @@ public class OcppClientService {
     private final UsuarioRepository usuarioRepository;
     private final ConectorRepository conectorRepository;
     private final TransacaoRepository transacaoRepository;
+    private final ConectorService conectorService;
 
 
 
-    public OcppClientService(RestTemplate restTemplate, OcppTokenService tokenService, UsuarioRepository usuarioRepository, ConectorRepository conectorRepository, TransacaoRepository transacaoRepository) {
+    public OcppClientService(RestTemplate restTemplate, OcppTokenService tokenService, UsuarioRepository usuarioRepository, ConectorRepository conectorRepository, TransacaoRepository transacaoRepository, ConectorService conectorService) {
         this.restTemplate = restTemplate;
         this.tokenService = tokenService;
         this.usuarioRepository = usuarioRepository;
         this.conectorRepository = conectorRepository;
         this.transacaoRepository = transacaoRepository;
+        this.conectorService = conectorService;
     }
 
 
@@ -62,6 +65,16 @@ public class OcppClientService {
                 .orElseThrow(() -> new RuntimeException("Conector não encontrado"));
 
 
+        if (conector.getTipo() == TipoConector.CC) {
+
+            boolean existeCCAtivo = conectorService
+                    .existeCCCarregando(remoteStartDTO.chargerId());
+
+            if (existeCCAtivo) {
+                throw new RegraDeNegociosException(
+                        "Não é possível usar esse conector enquanto existe outro ativo");
+            }
+        }
 
 
         System.out.println("Criando nova transação");

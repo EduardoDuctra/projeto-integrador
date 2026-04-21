@@ -33,8 +33,8 @@ public class Conector {
     @Enumerated(EnumType.STRING)
     private TipoConector tipo;
 
-    @Column(name = "em_uso")
-    private boolean emUso;
+    @Column(name = "disponivel_uso")
+    private boolean disponivelUso;
 
     @Column(name = "status_conector")
     @Enumerated(EnumType.STRING)
