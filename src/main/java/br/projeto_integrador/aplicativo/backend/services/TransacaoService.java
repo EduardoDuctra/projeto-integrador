@@ -2,12 +2,11 @@ package br.projeto_integrador.aplicativo.backend.services;
 
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
+import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusNotification;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValueDTO;
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValuesCompletoDTO;
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.SampledValueDTO;
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.StatusNotificationDTO;
+import br.projeto_integrador.aplicativo.backend.ocpp.dto.*;
+import br.projeto_integrador.aplicativo.backend.ocpp.service.OcppClientService;
 import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
 import org.springframework.stereotype.Service;
@@ -20,11 +19,16 @@ public class TransacaoService {
 
     private final TransacaoRepository transacaoRepository;
     private final ConectorRepository conectorRepository;
+    private final OcppClientService ocppClientService;
+    private final TransacaoFinanceiraService transacaoFinanceiraService;
 
 
-    public TransacaoService(TransacaoRepository transacaoRepository, ConectorRepository conectorRepository) {
+
+    public TransacaoService(TransacaoRepository transacaoRepository, ConectorRepository conectorRepository, OcppClientService ocppClientService, TransacaoFinanceiraService transacaoFinanceiraService) {
         this.transacaoRepository = transacaoRepository;
         this.conectorRepository = conectorRepository;
+        this.ocppClientService = ocppClientService;
+        this.transacaoFinanceiraService = transacaoFinanceiraService;
     }
 
 
@@ -102,6 +106,21 @@ public class TransacaoService {
 
                             transacao.setValorRecarga(valorGasto);
 
+                            //verificar se tem saldo
+                            boolean temSaldoCarregar = usuarioSaldo(transacao);
+
+                            if(!temSaldoCarregar){
+
+                                System.out.println("Saldo insuficiente, parando recarga");
+
+
+                                RemoteStopDTO dto = new RemoteStopDTO(conector.getCarregador().getIdCarregador(),
+                                        transacao.getIdTransacao());
+
+                                ocppClientService.pararRecarga(dto);
+
+                            }
+
                         }
 
                         else if ("Transaction.End".equals(sample.context())) {
@@ -119,6 +138,9 @@ public class TransacaoService {
                                     .multiply(transacao.getValorEnergia());
 
                             transacao.setValorRecarga(valorGasto);
+
+
+                            transacaoFinanceiraService.atualizarSaldoUsuario(transacao.getUsuario().getIdUsuario(),valorGasto);
 
                         }
 
@@ -164,6 +186,54 @@ public class TransacaoService {
 
         conectorRepository.save(conector);
         transacaoRepository.save(transacao);
+    }
+
+    public boolean usuarioSaldo(Transacao transacao){
+
+        Usuario usuario = transacao.getUsuario();
+        BigDecimal saldoUsuario = usuario.getSaldo();
+
+        BigDecimal valorAtual = transacao.getValorRecarga();
+        BigDecimal valorMaximo = transacao.getValorMaximo();
+
+
+        System.out.println("Saldo R$: " + saldoUsuario);
+        System.out.println("valorAtual R$: " + valorAtual);
+
+
+
+
+        if(valorAtual==null){
+            return true;
+        }
+
+        //valor atual > saldoUsuario
+        if(valorAtual.compareTo(saldoUsuario) > 0){
+
+            //se o valor for menor que zero
+            if(valorAtual.compareTo(BigDecimal.ZERO) <0){
+
+                valorAtual = BigDecimal.ZERO;
+
+            }
+
+            transacaoFinanceiraService.atualizarSaldoUsuario(transacao.getUsuario().getIdUsuario(), valorAtual);
+
+            return false;
+        }
+
+        //valor atual > valor maximo
+        else if(valorMaximo != null && valorAtual.compareTo(valorMaximo) > 0){
+
+
+
+            transacaoFinanceiraService.atualizarSaldoUsuario(transacao.getUsuario().getIdUsuario(), valorAtual);
+
+            return false;
+        }
+
+        //tem saldo ainda
+        return true;
     }
 
 

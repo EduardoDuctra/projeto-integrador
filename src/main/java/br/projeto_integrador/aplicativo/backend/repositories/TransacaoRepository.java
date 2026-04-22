@@ -2,6 +2,7 @@ package br.projeto_integrador.aplicativo.backend.repositories;
 
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
+import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,7 +15,8 @@ public interface TransacaoRepository extends JpaRepository <Transacao, Long> {
 
     Optional<Transacao> findByIdTransacao(Long idTransacao);
 
-    Optional<Transacao> findTopByConectorAndStatusTransacao(Conector conector, StatusTransacao statusTransacao
-    );
+    Optional<Transacao> findTopByConectorAndStatusTransacao(Conector conector, StatusTransacao statusTransacao);
+
+    Optional<Transacao> findTopByUsuarioAndStatusTransacao(Usuario usuario, StatusTransacao statusTransacao);
 
 }

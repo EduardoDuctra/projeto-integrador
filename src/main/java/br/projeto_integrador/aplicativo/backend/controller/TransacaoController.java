@@ -2,7 +2,9 @@ package br.projeto_integrador.aplicativo.backend.controller;
 
 
 import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarValorMaximoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoFinanceiraDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoAtivaDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoCreditoDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoDebitoDTO;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.TransacaoFinanceiraService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +29,11 @@ public class TransacaoController {
     }
 
     @PostMapping
-    public ResponseEntity<TransacaoFinanceiraDTO> criarTransacao(HttpServletRequest request,
-                                                                 @RequestBody TransacaoFinanceiraDTO transacaoDTO) {
+    public ResponseEntity<TransacaoCreditoDTO> criarTransacao(HttpServletRequest request,
+                                                              @RequestBody TransacaoCreditoDTO transacaoDTO) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
-        TransacaoFinanceiraDTO dtoSalvo = transacaoFinanceiraService.criarTransacao(id, transacaoDTO);
+        TransacaoCreditoDTO dtoSalvo = transacaoFinanceiraService.criarTransacao(id, transacaoDTO);
         return ResponseEntity.status(201).body(dtoSalvo);
 
     }
@@ -50,15 +52,41 @@ public class TransacaoController {
     }
 
     @GetMapping("/listar-transacoes-credito")
-    public ResponseEntity<List<TransacaoFinanceiraDTO>>listarTransacoes(HttpServletRequest request) {
+    public ResponseEntity<List<TransacaoCreditoDTO>>listarTransacoes(HttpServletRequest request) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
-        List<TransacaoFinanceiraDTO> transacoes = this.transacaoFinanceiraService.listarPorUsuario(id);
+        List<TransacaoCreditoDTO> transacoes = this.transacaoFinanceiraService.listarPorUsuario(id);
 
         if(transacoes.isEmpty()){
             return ResponseEntity.status(404).body(transacoes);
         }
         return ResponseEntity.status(200).body(transacoes);
+    }
+
+
+    @GetMapping("/listar-transacoes-debito")
+    public ResponseEntity<List<TransacaoDebitoDTO>>listarTransacoesDebito(HttpServletRequest request) {
+
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
+        List<TransacaoDebitoDTO> transacoes = this.transacaoFinanceiraService.listarTransacaoDebitoPorUsuario(id);
+
+        if(transacoes.isEmpty()){
+            return ResponseEntity.status(404).body(transacoes);
+        }
+        return ResponseEntity.status(200).body(transacoes);
+    }
+
+    @GetMapping("/listar-transacao-ativa")
+    public ResponseEntity<TransacaoAtivaDTO>listarTransacaoAtiva(HttpServletRequest request) {
+
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
+        TransacaoAtivaDTO transacaoAtiva = this.transacaoFinanceiraService.listarTransacaoAtivaPorUsuario(id);
+
+        if(transacaoAtiva == null){
+            return ResponseEntity.status(404).body(null);
+        }
+
+        return ResponseEntity.status(200).body(transacaoAtiva);
     }
 
 

@@ -2,7 +2,9 @@ package br.projeto_integrador.aplicativo.backend.services;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarValorMaximoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoFinanceiraDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoAtivaDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoCreditoDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoDebitoDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
@@ -16,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TransacaoFinanceiraService {
@@ -41,7 +44,7 @@ public class TransacaoFinanceiraService {
      * @return
      */
     @Transactional
-    public TransacaoFinanceiraDTO criarTransacao(Long idUsuario, TransacaoFinanceiraDTO dto) {
+    public TransacaoCreditoDTO criarTransacao(Long idUsuario, TransacaoCreditoDTO dto) {
 
         if (dto.valorRecarga() == null) {
             throw new RegraDeNegociosException("Valor não pode ser nulo");
@@ -73,7 +76,7 @@ public class TransacaoFinanceiraService {
 
         Transacao salva = transacaoRepository.save(transacaoFinanceira);
 
-        return new TransacaoFinanceiraDTO(
+        return new TransacaoCreditoDTO(
                 salva.getValorRecarga(),
                 salva.getDataInicio()
         );
@@ -111,7 +114,7 @@ public class TransacaoFinanceiraService {
 
 
 
-    public List<TransacaoFinanceiraDTO> listarPorUsuario(Long idUsuario) {
+    public List<TransacaoCreditoDTO> listarPorUsuario(Long idUsuario) {
 
         usuarioService.buscarPorId(idUsuario);
 
@@ -121,13 +124,13 @@ public class TransacaoFinanceiraService {
             throw new RegraDeNegociosException("Nenhuma transação encontrada para o usuário");
         }
 
-        List<TransacaoFinanceiraDTO> listaDTO = new ArrayList<>();
+        List<TransacaoCreditoDTO> listaDTO = new ArrayList<>();
 
         for (Transacao transacaoFinanceira : transacoes) {
 
             if(transacaoFinanceira.getTipoTransacao().equals(TipoTransacao.CREDITO)) {
 
-                TransacaoFinanceiraDTO dto = new TransacaoFinanceiraDTO(
+                TransacaoCreditoDTO dto = new TransacaoCreditoDTO(
                         transacaoFinanceira.getValorRecarga(),
                         transacaoFinanceira.getDataInicio()
                 );
@@ -141,4 +144,81 @@ public class TransacaoFinanceiraService {
         return listaDTO;
     }
 
+    public List<TransacaoDebitoDTO> listarTransacaoDebitoPorUsuario(Long idUsuario) {
+
+        usuarioService.buscarPorId(idUsuario);
+
+        List<Transacao> transacoes = transacaoRepository.findByUsuarioIdUsuario(idUsuario);
+
+        if (transacoes.isEmpty()) {
+            throw new RegraDeNegociosException("Nenhuma transação encontrada para o usuário");
+        }
+
+        List<TransacaoDebitoDTO> listaDTO = new ArrayList<>();
+
+        for (Transacao transacaoFinanceira : transacoes) {
+
+            if(transacaoFinanceira.getTipoTransacao().equals(TipoTransacao.DEBITO)) {
+
+                TransacaoDebitoDTO dto = new TransacaoDebitoDTO(
+                        transacaoFinanceira.getValorRecarga(),
+                        transacaoFinanceira.getEnergiaConsumida(),
+                        transacaoFinanceira.getDataInicio()
+                );
+
+                listaDTO.add(dto);
+
+            }
+
+        }
+
+        return listaDTO;
+    }
+
+
+
+    public TransacaoAtivaDTO listarTransacaoAtivaPorUsuario(Long id) {
+
+        Usuario usuario = usuarioService.buscarPorId(id);
+
+        Optional<Transacao> transacaoAtiva = transacaoRepository.findTopByUsuarioAndStatusTransacao(usuario, StatusTransacao.Charging);
+
+        if (transacaoAtiva.isEmpty()) {
+            throw new RegraDeNegociosException("Nenhuma transação ativa encontrada para o usuário");
+        }
+
+        Transacao t = transacaoAtiva.get();
+
+        return new TransacaoAtivaDTO(
+                t.getId(),
+                t.getIdTransacao(),
+                t.getStatusTransacao(),
+                t.getValorRecarga(),
+                t.getValorMaximo(),
+                t.getDataInicio(),
+                t.getSocAtual(),
+                t.getConector().getConnectorIdNoCarregador(),
+                t.getConector().getCarregador().getIdCarregador()
+        );
+
+    }
+
+    public void atualizarSaldoUsuario(Long id, BigDecimal valor) {
+
+        Usuario usuario = usuarioService.buscarPorId(id);
+
+        BigDecimal saldoAtual = usuario.getSaldo();
+        BigDecimal novoSaldo = saldoAtual.subtract(valor);
+
+
+        if (novoSaldo.compareTo(BigDecimal.ZERO) < 0) {
+            novoSaldo = BigDecimal.ZERO;
+        }
+
+        usuario.setSaldo(novoSaldo);
+        usuarioRepository.save(usuario);
+
+
+    }
 }
+
