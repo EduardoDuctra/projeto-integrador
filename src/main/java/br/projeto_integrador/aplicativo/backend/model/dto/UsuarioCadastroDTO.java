@@ -7,6 +7,5 @@ public record UsuarioCadastroDTO(Long idUsuario,
                                  String cpf,
                                  String telefone,
                                  String email,
-                                 String senha,
-                                 BigDecimal saldo) {
+                                 String senha) {
 }

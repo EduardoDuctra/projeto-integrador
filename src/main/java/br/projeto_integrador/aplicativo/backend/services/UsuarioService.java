@@ -80,8 +80,7 @@ public class UsuarioService {
                     usuario.getCpf(),
                     usuario.getTelefone(),
                     usuario.getEmail(),
-                    null,
-                    usuario.getSaldo()
+                    null
             ));
         }
 
