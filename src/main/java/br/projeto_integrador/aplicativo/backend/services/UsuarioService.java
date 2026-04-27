@@ -80,6 +80,7 @@ public class UsuarioService {
                     usuario.getCpf(),
                     usuario.getTelefone(),
                     usuario.getEmail(),
+                    usuario.getFotoUrl(),
                     null
             ));
         }
@@ -92,6 +93,8 @@ public class UsuarioService {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RegraDeNegociosException("Usuário não encontrado"));
     }
+
+
 
     @Transactional
     public UsuarioDTO  atualizarUsuario(Long id, UsuarioCadastroDTO dto) {

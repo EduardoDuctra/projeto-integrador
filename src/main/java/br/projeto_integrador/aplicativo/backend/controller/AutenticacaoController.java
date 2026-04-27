@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/login")
 public class AutenticacaoController {
@@ -73,16 +74,11 @@ public class AutenticacaoController {
         UserDetails userDetails = autenticacaoService.loadUserByUsername(usuario.getEmail());
 
         // Gera JWT
-        tokenServiceJWT.gerarToken(userDetails);
+        String token = tokenServiceJWT.gerarToken(userDetails);
 
-        // retorna token + dados do usuário
-        UsuarioDTO usuarioDTO = new UsuarioDTO(
-                usuario.getIdUsuario(),
-                usuario.getNome(),
-                usuario.getEmail()
-        );
 
-        return ResponseEntity.ok(usuarioDTO);
+        return ResponseEntity.ok(new DadosTokenJWTDTO(token));
+
     }
 
     @PostMapping("/esqueci-senha")

@@ -2,6 +2,7 @@ package br.projeto_integrador.aplicativo.backend.controller;
 
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCadastroDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
+import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,6 +55,27 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(usuarios);
     }
 
+    @GetMapping("/logado")
+    public ResponseEntity<UsuarioCadastroDTO>buscarUsuarioLogado(HttpServletRequest request){
+
+
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
+
+        Usuario usuario = usuarioService.buscarPorId(id);
+
+        UsuarioCadastroDTO dto = new UsuarioCadastroDTO(
+                usuario.getIdUsuario(),
+                usuario.getNome(),
+                usuario.getCpf(),
+                usuario.getTelefone(),
+                usuario.getEmail(),
+                usuario.getFotoUrl(),
+                null);
+
+        return ResponseEntity.status(200).body(dto);
+
+    }
+
 
     @PutMapping("/atualizar/logado")
     public ResponseEntity<UsuarioDTO> atualizarUsuario(HttpServletRequest request,
@@ -63,6 +85,7 @@ public class UsuarioController {
         UsuarioDTO atualizado = usuarioService.atualizarUsuario(id, dto);
 
         return ResponseEntity.ok(atualizado);
+
     }
 
 
