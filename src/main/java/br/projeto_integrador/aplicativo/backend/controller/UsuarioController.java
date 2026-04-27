@@ -70,6 +70,7 @@ public class UsuarioController {
                 usuario.getTelefone(),
                 usuario.getEmail(),
                 usuario.getFotoUrl(),
+                usuario.getSaldo(),
                 null);
 
         return ResponseEntity.status(200).body(dto);

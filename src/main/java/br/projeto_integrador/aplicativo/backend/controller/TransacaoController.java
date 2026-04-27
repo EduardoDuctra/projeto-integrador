@@ -7,12 +7,14 @@ import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoCreditoDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoDebitoDTO;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.TransacaoFinanceiraService;
+import br.projeto_integrador.aplicativo.backend.websocket.TransacaoSubject;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/transacao")
 public class TransacaoController {
@@ -20,12 +22,14 @@ public class TransacaoController {
 
     private final TransacaoFinanceiraService transacaoFinanceiraService;
     private final SecurityUtils securityUtils;
+    private final TransacaoSubject transacaoSubject;
 
 
-    public TransacaoController(TransacaoFinanceiraService transacaoFinanceiraService, SecurityUtils securityUtils) {
+    public TransacaoController(TransacaoFinanceiraService transacaoFinanceiraService, SecurityUtils securityUtils, TransacaoSubject transacaoSubject) {
         this.transacaoFinanceiraService = transacaoFinanceiraService;
 
         this.securityUtils = securityUtils;
+        this.transacaoSubject = transacaoSubject;
     }
 
     @PostMapping
@@ -34,6 +38,10 @@ public class TransacaoController {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
         TransacaoCreditoDTO dtoSalvo = transacaoFinanceiraService.criarTransacao(id, transacaoDTO);
+
+        //observer
+        transacaoSubject.notificar(id);
+
         return ResponseEntity.status(201).body(dtoSalvo);
 
     }
@@ -60,6 +68,8 @@ public class TransacaoController {
         if(transacoes.isEmpty()){
             return ResponseEntity.status(404).body(transacoes);
         }
+
+
         return ResponseEntity.status(200).body(transacoes);
     }
 

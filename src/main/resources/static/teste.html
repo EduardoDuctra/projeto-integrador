@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Teste WebSocket</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+</head>
+
+<body>
+<h2>Teste WebSocket</h2>
+
+<script>
+    const socket = new SockJS('/projeto-integrador/ws');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+        console.log('Conectado:', frame);
+
+        stompClient.subscribe('/topic/usuario/9', function(message) {
+            console.log('Recebido:', message.body);
+        });
+    });
+</script>
+
+</body>
+</html>

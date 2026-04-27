@@ -32,6 +32,11 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         System.out.println("PATH: " + path);
 
+        if (request.getRequestURI().contains("/ws")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
        //ignora filtro pro que vem do servidor/python
         //não tem token aqui para receber. apenas para mandar java -> python
         if (path.contains("/backend")) {

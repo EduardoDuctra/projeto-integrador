@@ -81,6 +81,7 @@ public class UsuarioService {
                     usuario.getTelefone(),
                     usuario.getEmail(),
                     usuario.getFotoUrl(),
+                    usuario.getSaldo(),
                     null
             ));
         }
