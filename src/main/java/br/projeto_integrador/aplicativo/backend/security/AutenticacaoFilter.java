@@ -44,6 +44,12 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (path.contains("/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+
         System.out.println("Filtro para autenticacao e autorização");
 
         String tokenJWT = recuperarToken(request);

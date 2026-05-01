@@ -39,8 +39,8 @@ public class TransacaoController {
         Long id = securityUtils.getUsuarioPeloIdToken(request);
         TransacaoCreditoDTO dtoSalvo = transacaoFinanceiraService.criarTransacao(id, transacaoDTO);
 
-        //observer
-        transacaoSubject.notificar(id);
+//        //observer
+//        transacaoSubject.notificar(id);
 
         return ResponseEntity.status(201).body(dtoSalvo);
 
@@ -95,6 +95,7 @@ public class TransacaoController {
         if(transacaoAtiva == null){
             return ResponseEntity.status(404).body(null);
         }
+
 
         return ResponseEntity.status(200).body(transacaoAtiva);
     }

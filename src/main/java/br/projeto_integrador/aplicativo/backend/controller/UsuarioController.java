@@ -1,6 +1,6 @@
 package br.projeto_integrador.aplicativo.backend.controller;
 
-import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCadastroDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCompletoDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
@@ -26,7 +26,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioDTO> criarUsuario(@RequestBody UsuarioCadastroDTO dto) {
+    public ResponseEntity<UsuarioDTO> criarUsuario(@RequestBody UsuarioCompletoDTO dto) {
 
        UsuarioDTO usarioSalvo = usuarioService.criarUsuario(dto);
        return ResponseEntity.status(201).body(usarioSalvo);
@@ -46,8 +46,8 @@ public class UsuarioController {
 
 
     @GetMapping("/listar-usuarios")
-    public ResponseEntity<List<UsuarioCadastroDTO>>listarUsuarios(){
-        List<UsuarioCadastroDTO> usuarios = this.usuarioService.listarUsuarios();
+    public ResponseEntity<List<UsuarioCompletoDTO>>listarUsuarios(){
+        List<UsuarioCompletoDTO> usuarios = this.usuarioService.listarUsuarios();
 
         if(usuarios.isEmpty()){
             return ResponseEntity.status(404).body(usuarios);
@@ -56,14 +56,24 @@ public class UsuarioController {
     }
 
     @GetMapping("/logado")
-    public ResponseEntity<UsuarioCadastroDTO>buscarUsuarioLogado(HttpServletRequest request){
+    public ResponseEntity<UsuarioCompletoDTO>buscarUsuarioLogado(HttpServletRequest request){
 
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
 
         Usuario usuario = usuarioService.buscarPorId(id);
 
-        UsuarioCadastroDTO dto = new UsuarioCadastroDTO(
+        Long idVeiculo = null;
+        String modeloVeiculo = null;
+
+        if(usuario.getVeiculoPrincipal() != null){
+
+            idVeiculo = usuario.getVeiculoPrincipal().getIdVeiculo();
+            modeloVeiculo = usuario.getVeiculoPrincipal().getModeloCarro();
+        }
+
+
+        UsuarioCompletoDTO dto = new UsuarioCompletoDTO(
                 usuario.getIdUsuario(),
                 usuario.getNome(),
                 usuario.getCpf(),
@@ -71,7 +81,9 @@ public class UsuarioController {
                 usuario.getEmail(),
                 usuario.getFotoUrl(),
                 usuario.getSaldo(),
-                null);
+                null,
+                idVeiculo,
+                modeloVeiculo);
 
         return ResponseEntity.status(200).body(dto);
 
@@ -80,7 +92,7 @@ public class UsuarioController {
 
     @PutMapping("/atualizar/logado")
     public ResponseEntity<UsuarioDTO> atualizarUsuario(HttpServletRequest request,
-                                                       @RequestBody UsuarioCadastroDTO dto) {
+                                                       @RequestBody UsuarioCompletoDTO dto) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
         UsuarioDTO atualizado = usuarioService.atualizarUsuario(id, dto);
@@ -88,6 +100,17 @@ public class UsuarioController {
         return ResponseEntity.ok(atualizado);
 
     }
+
+    @PutMapping("/atualizar-veiculo/{idVeiculo}")
+    public ResponseEntity<String> atualizarVeiculoPrincipal(HttpServletRequest request,
+                                                            @PathVariable Long idVeiculo){
+
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
+        String resposta = usuarioService.atualizarVeiculoPrincipal(id, idVeiculo);
+
+        return ResponseEntity.ok(resposta);
+    }
+
 
 
     @DeleteMapping("/deletar/logado")

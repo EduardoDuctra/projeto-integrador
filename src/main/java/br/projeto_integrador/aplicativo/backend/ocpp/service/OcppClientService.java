@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -86,6 +87,7 @@ public class OcppClientService {
         transacao.setTipoTransacao(TipoTransacao.DEBITO);
         transacao.setDataInicio(LocalDateTime.now());
         transacao.setValorEnergia(BigDecimal.valueOf(conector.getValorEnergia()));
+        transacao.setModeloVeiculo(usuario.getVeiculoPrincipal().getModeloCarro());
 
         transacaoRepository.save(transacao);
 

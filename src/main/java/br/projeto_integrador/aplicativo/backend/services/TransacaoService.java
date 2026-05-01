@@ -9,6 +9,7 @@ import br.projeto_integrador.aplicativo.backend.ocpp.dto.*;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.OcppClientService;
 import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
+import br.projeto_integrador.aplicativo.backend.websocket.TransacaoSubject;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,14 +22,17 @@ public class TransacaoService {
     private final ConectorRepository conectorRepository;
     private final OcppClientService ocppClientService;
     private final TransacaoFinanceiraService transacaoFinanceiraService;
+    private final TransacaoSubject transacaoSubject;
 
 
 
-    public TransacaoService(TransacaoRepository transacaoRepository, ConectorRepository conectorRepository, OcppClientService ocppClientService, TransacaoFinanceiraService transacaoFinanceiraService) {
+
+    public TransacaoService(TransacaoRepository transacaoRepository, ConectorRepository conectorRepository, OcppClientService ocppClientService, TransacaoFinanceiraService transacaoFinanceiraService, TransacaoSubject transacaoSubject) {
         this.transacaoRepository = transacaoRepository;
         this.conectorRepository = conectorRepository;
         this.ocppClientService = ocppClientService;
         this.transacaoFinanceiraService = transacaoFinanceiraService;
+        this.transacaoSubject = transacaoSubject;
     }
 
 
@@ -186,6 +190,9 @@ public class TransacaoService {
 
         conectorRepository.save(conector);
         transacaoRepository.save(transacao);
+
+        //observer
+        transacaoSubject.notificar(transacao.getUsuario().getIdUsuario());
     }
 
     public boolean usuarioSaldo(Transacao transacao){
@@ -219,6 +226,9 @@ public class TransacaoService {
 
             transacaoFinanceiraService.atualizarSaldoUsuario(transacao.getUsuario().getIdUsuario(), valorAtual);
 
+            //notifier
+            transacaoSubject.notificar(usuario.getIdUsuario());
+
             return false;
         }
 
@@ -229,8 +239,14 @@ public class TransacaoService {
 
             transacaoFinanceiraService.atualizarSaldoUsuario(transacao.getUsuario().getIdUsuario(), valorAtual);
 
+            //notifier
+            transacaoSubject.notificar(usuario.getIdUsuario());
+
             return false;
         }
+
+        //notifier
+        transacaoSubject.notificar(usuario.getIdUsuario());
 
         //tem saldo ainda
         return true;

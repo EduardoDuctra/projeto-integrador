@@ -50,4 +50,9 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<Veiculo> veiculos;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_veiculo_principal")
+    private Veiculo veiculoPrincipal;
+
 }

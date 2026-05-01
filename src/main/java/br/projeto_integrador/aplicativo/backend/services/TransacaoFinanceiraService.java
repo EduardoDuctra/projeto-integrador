@@ -11,6 +11,7 @@ import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoTransacao;
 import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
+import br.projeto_integrador.aplicativo.backend.websocket.TransacaoSubject;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +28,17 @@ public class TransacaoFinanceiraService {
     private final TransacaoRepository transacaoRepository;
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
+    private final TransacaoSubject transacaoSubject;
 
 
 
-    public TransacaoFinanceiraService(TransacaoRepository transacaoRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService) {
+
+    public TransacaoFinanceiraService(TransacaoRepository transacaoRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService, TransacaoSubject transacaoSubject) {
 
         this.transacaoRepository = transacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
+        this.transacaoSubject = transacaoSubject;
     }
 
 
@@ -76,6 +80,9 @@ public class TransacaoFinanceiraService {
 
         Transacao salva = transacaoRepository.save(transacaoFinanceira);
 
+        //observer
+        transacaoSubject.notificar(idUsuario);
+
         return new TransacaoCreditoDTO(
                 salva.getValorRecarga(),
                 salva.getDataInicio()
@@ -106,6 +113,7 @@ public class TransacaoFinanceiraService {
 
 
         transacaoRepository.save(transacao);
+
 
 
         return new AtualizarValorMaximoDTO(valorMaximo);
@@ -163,7 +171,8 @@ public class TransacaoFinanceiraService {
                 TransacaoDebitoDTO dto = new TransacaoDebitoDTO(
                         transacaoFinanceira.getValorRecarga(),
                         transacaoFinanceira.getEnergiaConsumida(),
-                        transacaoFinanceira.getDataInicio()
+                        transacaoFinanceira.getDataInicio(),
+                        transacaoFinanceira.getModeloVeiculo()
                 );
 
                 listaDTO.add(dto);
@@ -218,6 +227,9 @@ public class TransacaoFinanceiraService {
         usuario.setSaldo(novoSaldo);
         usuarioRepository.save(usuario);
 
+
+        //observer
+        transacaoSubject.notificar(id);
 
     }
 }

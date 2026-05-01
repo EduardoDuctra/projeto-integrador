@@ -61,6 +61,8 @@ public class Transacao {
     @Column(name = "soc_atual")
     private Double socAtual;
 
+    @Column(name = "modelo_veiculo")
+    private String modeloVeiculo;
 
     @ManyToOne
     @JoinColumn(name = "id_conector")

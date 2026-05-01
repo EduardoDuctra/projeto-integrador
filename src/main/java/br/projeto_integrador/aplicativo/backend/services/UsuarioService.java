@@ -3,11 +3,13 @@ package br.projeto_integrador.aplicativo.backend.services;
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import br.projeto_integrador.aplicativo.backend.model.CodigoRecuperacao;
 import br.projeto_integrador.aplicativo.backend.model.dto.GoogleUserInfoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCadastroDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCompletoDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
+import br.projeto_integrador.aplicativo.backend.model.entity.Veiculo;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusUsuario;
 import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
+import br.projeto_integrador.aplicativo.backend.repositories.VeiculoRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import jakarta.transaction.Transactional;
@@ -25,15 +27,17 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final Cloudinary cloudinary;
     private final EmailService emailService;
+    private final VeiculoRepository veiculoRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, Cloudinary cloudinary, EmailService emailService) {
+    public UsuarioService(UsuarioRepository usuarioRepository, Cloudinary cloudinary, EmailService emailService, VeiculoRepository veiculoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.cloudinary = cloudinary;
         this.emailService = emailService;
+        this.veiculoRepository = veiculoRepository;
     }
 
     @Transactional
-    public UsuarioDTO criarUsuario (UsuarioCadastroDTO dto){
+    public UsuarioDTO criarUsuario (UsuarioCompletoDTO dto){
 
         if(usuarioRepository.existsByEmail(dto.email())){
             throw new RegraDeNegociosException("Email já cadastrado");
@@ -63,10 +67,10 @@ public class UsuarioService {
         );
     }
 
-    public List<UsuarioCadastroDTO> listarUsuarios() {
+    public List<UsuarioCompletoDTO> listarUsuarios() {
 
         List<Usuario> usuarios = usuarioRepository.findAll();
-        List<UsuarioCadastroDTO> listaUsuarios = new ArrayList<>();
+        List<UsuarioCompletoDTO> listaUsuarios = new ArrayList<>();
 
         for (Usuario usuario : usuarios) {
 
@@ -74,7 +78,17 @@ public class UsuarioService {
                 continue;
             }
 
-            listaUsuarios.add(new UsuarioCadastroDTO(
+
+            Long idVeiculo = null;
+            String modeloVeiculo = null;
+
+            if(usuario.getVeiculoPrincipal() != null){
+
+                idVeiculo = usuario.getVeiculoPrincipal().getIdVeiculo();
+                modeloVeiculo = usuario.getVeiculoPrincipal().getModeloCarro();
+            }
+
+            listaUsuarios.add(new UsuarioCompletoDTO(
                     usuario.getIdUsuario(),
                     usuario.getNome(),
                     usuario.getCpf(),
@@ -82,7 +96,9 @@ public class UsuarioService {
                     usuario.getEmail(),
                     usuario.getFotoUrl(),
                     usuario.getSaldo(),
-                    null
+                    null,
+                    idVeiculo,
+                    modeloVeiculo
             ));
         }
 
@@ -98,7 +114,7 @@ public class UsuarioService {
 
 
     @Transactional
-    public UsuarioDTO  atualizarUsuario(Long id, UsuarioCadastroDTO dto) {
+    public UsuarioDTO  atualizarUsuario(Long id, UsuarioCompletoDTO dto) {
 
         Usuario usuario = null;
         try {
@@ -127,6 +143,27 @@ public class UsuarioService {
                 atualizado.getNome(),
                 atualizado.getEmail()
         );
+
+    }
+
+    @Transactional
+    public String atualizarVeiculoPrincipal(Long idUsuario, Long idVeiculoPrincipal){
+
+        Usuario usuario = null;
+        Veiculo veiculo = null;
+
+        try {
+            usuario = buscarPorId(idUsuario);
+            veiculo = veiculoRepository.findById(idVeiculoPrincipal).get();
+        } catch (Exception e) {
+            throw new RegraDeNegociosException("Usuário ou veículo não encontrado");
+        }
+
+        usuario.setVeiculoPrincipal(veiculo);
+        usuarioRepository.save(usuario);
+
+        return
+                "Veículo alterado com sucesso - " + usuario.getVeiculoPrincipal().getModeloCarro();
 
     }
 

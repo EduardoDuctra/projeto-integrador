@@ -5,5 +5,6 @@ import java.time.LocalDateTime;
 
 public record TransacaoDebitoDTO(BigDecimal valorRecarga,
                                  double recargaKwh,
-                                 LocalDateTime dataInicio) {
+                                 LocalDateTime dataInicio,
+                                 String modelo) {
 }
