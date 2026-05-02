@@ -57,6 +57,9 @@ public class GatewayController {
         //para ver se tem um CC sendo utilizado -> outro fica indisponível
         conectorService.atualizarDisponivelUsoCC(payload.charger_id());
 
+        //atualizar status carregador
+        carregadorService.atualizarStatusCarregadores(payload.charger_id());
+
         return ResponseEntity.ok().build();
     }
 
@@ -67,6 +70,7 @@ public class GatewayController {
 
         System.out.println("Recebido heartbeat:");
         System.out.println(payload);
+
 
 
         return ResponseEntity.ok().build();

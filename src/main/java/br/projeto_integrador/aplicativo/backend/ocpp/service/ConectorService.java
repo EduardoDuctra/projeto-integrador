@@ -7,6 +7,7 @@ import br.projeto_integrador.aplicativo.backend.model.entity.Carregador;
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
+import br.projeto_integrador.aplicativo.backend.model.enums.StatusCarregador;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusNotification;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValueDTO;
@@ -234,7 +235,7 @@ public class ConectorService {
 
         List<Conector> conectores = conectorRepository.findByCarregador_IdCarregador(idCarregador);
 
-        List<ConectorDTO> conectoresDisponiveis = new ArrayList<ConectorDTO>();
+        List<ConectorDTO> conectoresDisponiveis = new ArrayList<>();
 
         for(Conector c : conectores){
             if(c.isDisponivelUso()){
@@ -250,6 +251,7 @@ public class ConectorService {
                 conectoresDisponiveis.add(dto);
             }
         }
+
 
         return conectoresDisponiveis;
 

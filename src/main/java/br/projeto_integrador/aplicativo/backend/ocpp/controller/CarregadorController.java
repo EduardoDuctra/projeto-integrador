@@ -2,6 +2,8 @@ package br.projeto_integrador.aplicativo.backend.ocpp.controller;
 
 
 import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarCarregadorDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.CarregadorDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.ConectorDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStartDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStopDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.UnlockConnectorDTO;
@@ -11,6 +13,8 @@ import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 //envia os dados para o servidor
 @RestController
@@ -66,6 +70,19 @@ public class CarregadorController {
         String response = carregadorService.atualizarInformacoes(dto);
 
         return ResponseEntity.status(200).body(response);
+    }
+
+    @GetMapping("/disponiveis")
+    public ResponseEntity<List<CarregadorDTO>>conectoresDisponiveis(){
+
+        List<CarregadorDTO> lista = carregadorService.listarCarregadoresDisponiveis();
+
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.status(200).body(lista);
     }
 }
 

@@ -6,4 +6,6 @@ public interface Observer {
 
     void atualizarCarregador(String idCarregador);
 
+    void atualizarTodosCarregadores();
+
 }

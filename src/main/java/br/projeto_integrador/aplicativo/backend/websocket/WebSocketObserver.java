@@ -29,4 +29,14 @@ public class WebSocketObserver implements Observer {
                 "atualização de estado"
         );
     }
+
+    @Override
+    public void atualizarTodosCarregadores() {
+        messagingTemplate.convertAndSend(
+                "/topic/carregadores",
+                "atualizacao"
+        );
+    }
+
+
 }

@@ -2,18 +2,33 @@ package br.projeto_integrador.aplicativo.backend.ocpp.service;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarCarregadorDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.CarregadorDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.ConectorDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Carregador;
+import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
+import br.projeto_integrador.aplicativo.backend.model.enums.StatusCarregador;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.BootNotificationDTO;
 import br.projeto_integrador.aplicativo.backend.repositories.CarregadorRepository;
+import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
+import br.projeto_integrador.aplicativo.backend.websocket.TransacaoSubject;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CarregadorService {
 
     private final CarregadorRepository carregadorRepository;
+    private final ConectorRepository conectorRepository;
+    private final TransacaoSubject transacaoSubject;
 
-    public CarregadorService(CarregadorRepository carregadorRepository) {
+
+    public CarregadorService(CarregadorRepository carregadorRepository, ConectorRepository conectorRepository, TransacaoSubject transacaoSubject) {
         this.carregadorRepository = carregadorRepository;
+        this.conectorRepository = conectorRepository;
+
+        this.transacaoSubject = transacaoSubject;
     }
 
     //vem direto do OCPP
@@ -55,6 +70,7 @@ public class CarregadorService {
 
 
         try {
+            carregador.setStatusCarregador(StatusCarregador.DISPONIVEL);
             carregadorRepository.save(carregador);
         } catch (Exception e) {
             throw new RegraDeNegociosException("Erro ao salvar carregador no banco de dados");
@@ -102,4 +118,70 @@ public class CarregadorService {
         return response;
 
     }
+
+    public void atualizarStatusCarregadores(String idCarregador){
+
+
+        List<Conector> conectores = conectorRepository.findByCarregador_IdCarregador(idCarregador);
+
+        boolean temDisponivel = false;
+
+        for(Conector c : conectores){
+
+            if(c.isDisponivelUso()){
+
+                temDisponivel = true;
+                break;
+
+            }
+        }
+
+        //atualizar status carregadores
+        Carregador carregador = carregadorRepository.findById(idCarregador)
+                .orElseThrow(() -> new RegraDeNegociosException("Carregador não encontrado"));
+
+        if(!temDisponivel){
+
+            carregador.setStatusCarregador(StatusCarregador.OCUPADO);
+
+            carregadorRepository.save(carregador);
+
+        } else{
+
+            carregador.setStatusCarregador(StatusCarregador.DISPONIVEL);
+
+            carregadorRepository.save(carregador);
+
+        }
+
+        //notifier
+        transacaoSubject.notificarTodosCarregadores();
+
+    }
+
+    public List<CarregadorDTO> listarCarregadoresDisponiveis(){
+
+
+        List<Carregador> carregadores = carregadorRepository.findAll();
+
+        List<CarregadorDTO> carregadoresDisponiveis = new ArrayList<>();
+
+        for(Carregador c : carregadores){
+
+            if(c.getStatusCarregador() == StatusCarregador.DISPONIVEL){
+
+                CarregadorDTO dto = new CarregadorDTO(
+                        c.getIdCarregador(),
+                        c.getStatusCarregador(),
+                        c.getCidade()
+                );
+
+                carregadoresDisponiveis.add(dto);
+            }
+        }
+
+        return carregadoresDisponiveis;
+
+    }
+
 }

@@ -25,4 +25,10 @@ public class TransacaoSubject {
             o.atualizarCarregador(idCarregador);
         }
     }
+
+    public void notificarTodosCarregadores(){
+        for (Observer o : observers){
+            o.atualizarTodosCarregadores();
+        }
+    }
 }
