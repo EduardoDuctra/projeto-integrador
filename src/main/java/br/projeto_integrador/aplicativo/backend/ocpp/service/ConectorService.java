@@ -2,8 +2,11 @@ package br.projeto_integrador.aplicativo.backend.ocpp.service;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarConectorDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.ConectorDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Carregador;
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
+import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
+import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusNotification;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValueDTO;
@@ -12,20 +15,34 @@ import br.projeto_integrador.aplicativo.backend.ocpp.dto.SampledValueDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.StatusNotificationDTO;
 import br.projeto_integrador.aplicativo.backend.repositories.CarregadorRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
+import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
+import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
+import br.projeto_integrador.aplicativo.backend.websocket.TransacaoSubject;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConectorService {
 
     private final CarregadorRepository carregadorRepository;
     private final ConectorRepository conectorRepository;
+    private final UsuarioService usuarioService;
+    private final TransacaoRepository transacaoRepository;
+    private final TransacaoSubject transacaoSubject;
 
 
-    public ConectorService(CarregadorRepository carregadorRepository, ConectorRepository conectorRepository) {
+
+    public ConectorService(CarregadorRepository carregadorRepository, ConectorRepository conectorRepository, UsuarioService usuarioService, TransacaoRepository transacaoRepository, TransacaoSubject transacaoSubject) {
         this.carregadorRepository = carregadorRepository;
         this.conectorRepository = conectorRepository;
+        this.usuarioService = usuarioService;
+        this.transacaoRepository = transacaoRepository;
+        this.transacaoSubject = transacaoSubject;
     }
 
 
@@ -164,6 +181,8 @@ public class ConectorService {
         return false;
     }
 
+
+
     public void atualizarDisponivelUsoCC(String idCarregador) {
 
         List<Conector> conectores = conectorRepository
@@ -199,8 +218,79 @@ public class ConectorService {
                     conector.setDisponivelUso(true);
                 }
 
+
                 conectorRepository.save(conector);
             }
         }
+
+        //notifier
+        transacaoSubject.notificarCarregador(idCarregador);
+
     }
+
+
+    public List<ConectorDTO>conectoresPorCarregador(String idCarregador){
+
+
+        List<Conector> conectores = conectorRepository.findByCarregador_IdCarregador(idCarregador);
+
+        List<ConectorDTO> conectoresDisponiveis = new ArrayList<ConectorDTO>();
+
+        for(Conector c : conectores){
+            if(c.isDisponivelUso()){
+
+                ConectorDTO dto = new ConectorDTO(
+                        c.getId(),
+                        c.getConnectorIdNoCarregador(),
+                        c.getTipo(),
+                        true,
+                        c.getNomeConector(),
+                        c.getCarregador().getIdCarregador()
+                );
+                conectoresDisponiveis.add(dto);
+            }
+        }
+
+        return conectoresDisponiveis;
+
+    }
+
+
+
+    //lista Retorna o conector da transação ativa
+    public ConectorDTO listarTransacaoAtivaRecentementePorUsuario(Long id) {
+
+        Usuario usuario = usuarioService.buscarPorId(id);
+
+        Optional<Transacao> transacaoRecente = transacaoRepository.findTopByUsuarioAndDataFimIsNotNullOrderByDataFimDesc(usuario);
+
+        if (transacaoRecente.isEmpty()){
+            return null;
+        }
+
+        Transacao t = transacaoRecente.get();
+
+        LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+
+        LocalDateTime cincoMinutos = agora.minusMinutes(5);
+
+
+        if (t.getDataFim().isAfter(cincoMinutos)) {
+
+            Conector c = t.getConector();
+
+            return new ConectorDTO(
+                    c.getId(),
+                    c.getConnectorIdNoCarregador(),
+                    c.getTipo(),
+                    c.isDisponivelUso(),
+                    c.getNomeConector(),
+                    c.getCarregador().getIdCarregador()
+            );
+        }
+
+        return null;
+    }
+
+
 }

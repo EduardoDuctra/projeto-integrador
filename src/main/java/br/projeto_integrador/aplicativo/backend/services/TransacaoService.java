@@ -1,5 +1,6 @@
 package br.projeto_integrador.aplicativo.backend.services;
 
+import br.projeto_integrador.aplicativo.backend.model.dto.ConectorDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class TransacaoService {
@@ -33,6 +35,7 @@ public class TransacaoService {
         this.ocppClientService = ocppClientService;
         this.transacaoFinanceiraService = transacaoFinanceiraService;
         this.transacaoSubject = transacaoSubject;
+
     }
 
 
@@ -251,6 +254,9 @@ public class TransacaoService {
         //tem saldo ainda
         return true;
     }
+
+
+
 
 
 }

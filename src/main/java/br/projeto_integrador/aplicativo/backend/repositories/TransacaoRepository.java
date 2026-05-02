@@ -19,4 +19,8 @@ public interface TransacaoRepository extends JpaRepository <Transacao, Long> {
 
     Optional<Transacao> findTopByUsuarioAndStatusTransacao(Usuario usuario, StatusTransacao statusTransacao);
 
+    Optional<Transacao> findTopByUsuarioOrderByDataFimDesc(Usuario usuario);
+
+    Optional<Transacao> findTopByUsuarioAndDataFimIsNotNullOrderByDataFimDesc(Usuario usuario);
+
 }

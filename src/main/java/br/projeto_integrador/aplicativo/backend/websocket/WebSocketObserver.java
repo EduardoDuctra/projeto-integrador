@@ -21,4 +21,12 @@ public class WebSocketObserver implements Observer {
                 "atualização de estado"
         );
     }
+
+    @Override
+    public void atualizarCarregador(String idCarregador) {
+        messagingTemplate.convertAndSend(
+                "/topic/carregador/" + idCarregador,
+                "atualização de estado"
+        );
+    }
 }

@@ -1,14 +1,15 @@
 package br.projeto_integrador.aplicativo.backend.services;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
-import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarValorMaximoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoAtivaDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoCreditoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoDebitoDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.*;
+import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
+import br.projeto_integrador.aplicativo.backend.model.enums.NomeConector;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
+import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoTransacao;
+import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
 import br.projeto_integrador.aplicativo.backend.websocket.TransacaoSubject;
@@ -29,16 +30,16 @@ public class TransacaoFinanceiraService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
     private final TransacaoSubject transacaoSubject;
+    private final ConectorRepository conectorRepository;
 
 
-
-
-    public TransacaoFinanceiraService(TransacaoRepository transacaoRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService, TransacaoSubject transacaoSubject) {
+    public TransacaoFinanceiraService(TransacaoRepository transacaoRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService, TransacaoSubject transacaoSubject, ConectorRepository conectorRepository) {
 
         this.transacaoRepository = transacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
         this.transacaoSubject = transacaoSubject;
+        this.conectorRepository = conectorRepository;
     }
 
 
@@ -212,6 +213,9 @@ public class TransacaoFinanceiraService {
 
     }
 
+
+
+
     public void atualizarSaldoUsuario(Long id, BigDecimal valor) {
 
         Usuario usuario = usuarioService.buscarPorId(id);
@@ -228,8 +232,8 @@ public class TransacaoFinanceiraService {
         usuarioRepository.save(usuario);
 
 
-        //observer
-        transacaoSubject.notificar(id);
+//        //observer
+//        transacaoSubject.notificar(id);
 
     }
 }
