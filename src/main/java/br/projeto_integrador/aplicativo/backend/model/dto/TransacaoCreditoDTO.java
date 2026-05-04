@@ -4,5 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record TransacaoCreditoDTO(BigDecimal valorRecarga,
-                                  LocalDateTime dataInicio) {
+                                  LocalDateTime dataInicio,
+                                  Long id) {
 }

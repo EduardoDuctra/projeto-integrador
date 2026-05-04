@@ -1,13 +1,13 @@
 package br.projeto_integrador.aplicativo.backend.services;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
-import br.projeto_integrador.aplicativo.backend.model.dto.*;
-import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
+import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarValorMaximoDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoAtivaDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoCreditoDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoDebitoDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
-import br.projeto_integrador.aplicativo.backend.model.enums.NomeConector;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
-import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoTransacao;
 import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
@@ -30,23 +30,22 @@ public class TransacaoFinanceiraService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
     private final TransacaoSubject transacaoSubject;
-    private final ConectorRepository conectorRepository;
 
 
-    public TransacaoFinanceiraService(TransacaoRepository transacaoRepository, UsuarioRepository usuarioRepository, UsuarioService usuarioService, TransacaoSubject transacaoSubject, ConectorRepository conectorRepository) {
+    public TransacaoFinanceiraService(TransacaoRepository transacaoRepository, UsuarioRepository usuarioRepository,
+                                      UsuarioService usuarioService, TransacaoSubject transacaoSubject) {
 
         this.transacaoRepository = transacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.usuarioService = usuarioService;
         this.transacaoSubject = transacaoSubject;
-        this.conectorRepository = conectorRepository;
     }
 
 
     /**
      * usar somente para CRÉDITO
      * @param dto
-     * @return
+     * @return TransacaoCreditoDTO
      */
     @Transactional
     public TransacaoCreditoDTO criarTransacao(Long idUsuario, TransacaoCreditoDTO dto) {
@@ -54,7 +53,6 @@ public class TransacaoFinanceiraService {
         if (dto.valorRecarga() == null) {
             throw new RegraDeNegociosException("Valor não pode ser nulo");
         }
-
 
         Usuario usuario = usuarioService.buscarPorId(idUsuario);
 
@@ -66,17 +64,11 @@ public class TransacaoFinanceiraService {
 
         if(dto.valorRecarga() != null) {
             transacaoFinanceira.setTipoTransacao(TipoTransacao.CREDITO);
-            transacaoFinanceira.setStatusTransacao(StatusTransacao.APROVADA);
+            transacaoFinanceira.setStatusTransacao(StatusTransacao.PENDENTE);
             transacaoFinanceira.setValorRecarga(dto.valorRecarga());
         }
 
         transacaoFinanceira.setUsuario(usuario);
-
-        BigDecimal saldoUsuario = usuario.getSaldo().add(dto.valorRecarga());
-        usuario.setSaldo(saldoUsuario);
-
-
-        usuarioRepository.save(usuario);
 
 
         Transacao salva = transacaoRepository.save(transacaoFinanceira);
@@ -86,14 +78,18 @@ public class TransacaoFinanceiraService {
 
         return new TransacaoCreditoDTO(
                 salva.getValorRecarga(),
-                salva.getDataInicio()
-        );
+                salva.getDataInicio(),
+                salva.getId());
     }
 
 
-
-
-
+    /**
+     * usar para atualizar o valor máximo de uma transação -> até quanto quer gastar na recarga
+     * @param idUsuario
+     * @param idTransacao
+     * @param valorMaximo
+     * @return AtualizarValorMaximoDTO
+     */
     @Transactional
     public AtualizarValorMaximoDTO atualizarTransacao(Long idUsuario, Long idTransacao, BigDecimal valorMaximo) {
 
@@ -121,8 +117,11 @@ public class TransacaoFinanceiraService {
     }
 
 
-
-
+    /**
+     * lista as transações de crédito do usuário
+     * @param idUsuario
+     * @return  List<TransacaoCreditoDTO>
+     */
     public List<TransacaoCreditoDTO> listarPorUsuario(Long idUsuario) {
 
         usuarioService.buscarPorId(idUsuario);
@@ -141,7 +140,8 @@ public class TransacaoFinanceiraService {
 
                 TransacaoCreditoDTO dto = new TransacaoCreditoDTO(
                         transacaoFinanceira.getValorRecarga(),
-                        transacaoFinanceira.getDataInicio()
+                        transacaoFinanceira.getDataInicio(),
+                        transacaoFinanceira.getId()
                 );
 
                 listaDTO.add(dto);
@@ -153,6 +153,11 @@ public class TransacaoFinanceiraService {
         return listaDTO;
     }
 
+    /**
+     * lista as transações de débito do usuário
+     * @param idUsuario
+     * @return  List<TransacaoDebitoDTO>
+     */
     public List<TransacaoDebitoDTO> listarTransacaoDebitoPorUsuario(Long idUsuario) {
 
         usuarioService.buscarPorId(idUsuario);
@@ -186,7 +191,11 @@ public class TransacaoFinanceiraService {
     }
 
 
-
+    /**
+     * lista a transação ativa do usuário -> o carregamento ativo dele
+     * @param id
+     * @return TransacaoAtivaDTO
+     */
     public TransacaoAtivaDTO listarTransacaoAtivaPorUsuario(Long id) {
 
         Usuario usuario = usuarioService.buscarPorId(id);
@@ -214,8 +223,11 @@ public class TransacaoFinanceiraService {
     }
 
 
-
-
+    /**
+     * atualiza o saldo do usuário
+     * @param id
+     * @param valor
+     */
     public void atualizarSaldoUsuario(Long id, BigDecimal valor) {
 
         Usuario usuario = usuarioService.buscarPorId(id);
@@ -231,9 +243,6 @@ public class TransacaoFinanceiraService {
         usuario.setSaldo(novoSaldo);
         usuarioRepository.save(usuario);
 
-
-//        //observer
-//        transacaoSubject.notificar(id);
 
     }
 }

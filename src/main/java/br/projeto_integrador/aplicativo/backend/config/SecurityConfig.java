@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/backend/**").permitAll()
                         .requestMatchers("/teste.html").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/webhook/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

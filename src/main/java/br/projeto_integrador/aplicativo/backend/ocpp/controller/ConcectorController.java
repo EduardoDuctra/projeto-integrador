@@ -19,16 +19,21 @@ public class ConcectorController {
 
     private final ConectorService conectorService;
     private final SecurityUtils securityUtils;
-    private final TransacaoService transacaoService;
 
 
-    public ConcectorController(ConectorService conectorService, SecurityUtils securityUtils, TransacaoService transacaoService) {
+
+    public ConcectorController(ConectorService conectorService, SecurityUtils securityUtils) {
         this.conectorService = conectorService;
         this.securityUtils = securityUtils;
-        this.transacaoService = transacaoService;
     }
 
 
+    /**
+     * atualiza os conectores
+     * usado para dizer o tipo CC/CA
+     * @param dto
+     * @return
+     */
     @PutMapping("/atualizar-conector")
     public ResponseEntity<String> atualizarInformacoes(@RequestBody AtualizarConectorDTO dto){
 
@@ -38,6 +43,12 @@ public class ConcectorController {
     }
 
 
+    /**
+     * recebe o id do usuario e lista o que ele usou recentemetne
+     * usado para poder liberar forçado, se precisar
+     * @param request
+     * @return ConectorDTO
+     */
     @GetMapping("/usado-recentemente-pelo-usuario")
     public ResponseEntity<ConectorDTO> conectorUsadoRecentemente(HttpServletRequest request){
 
@@ -52,6 +63,11 @@ public class ConcectorController {
         return ResponseEntity.status(200).body(dto);
     }
 
+    /**
+     * lista os conectores de cada carregador disponível
+     * @param idCarregador
+     * @return List<ConectorDTO>
+     */
     @GetMapping("/disponiveis/{idCarregador}")
     public ResponseEntity<List<ConectorDTO>>conectoresDisponiveis(@PathVariable String idCarregador){
 

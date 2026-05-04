@@ -29,7 +29,8 @@ public class UsuarioService {
     private final EmailService emailService;
     private final VeiculoRepository veiculoRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, Cloudinary cloudinary, EmailService emailService, VeiculoRepository veiculoRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, Cloudinary cloudinary,
+                          EmailService emailService, VeiculoRepository veiculoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.cloudinary = cloudinary;
         this.emailService = emailService;

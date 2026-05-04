@@ -24,7 +24,8 @@ public class CarregadorService {
     private final TransacaoSubject transacaoSubject;
 
 
-    public CarregadorService(CarregadorRepository carregadorRepository, ConectorRepository conectorRepository, TransacaoSubject transacaoSubject) {
+    public CarregadorService(CarregadorRepository carregadorRepository, ConectorRepository conectorRepository,
+                             TransacaoSubject transacaoSubject) {
         this.carregadorRepository = carregadorRepository;
         this.conectorRepository = conectorRepository;
 
@@ -119,6 +120,11 @@ public class CarregadorService {
 
     }
 
+    /**
+     * verifica se tem conector disponivel -> se não tiver seta o status do carregador paraa indisponivek
+     * notifica o listener
+     * @param idCarregador
+     */
     public void atualizarStatusCarregadores(String idCarregador){
 
 

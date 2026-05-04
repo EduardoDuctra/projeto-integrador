@@ -7,6 +7,9 @@ import br.projeto_integrador.aplicativo.backend.model.entity.Veiculo;
 import br.projeto_integrador.aplicativo.backend.repositories.VeiculoRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class VeiculoService {
 
@@ -47,22 +50,22 @@ public class VeiculoService {
     }
 
 
-    public VeiculoDTO listarVeiculoUsuario(Long idUsuario) {
+    public List<VeiculoDTO> listarVeiculoUsuario(Long idUsuario) {
 
         usuarioService.buscarPorId(idUsuario);
 
-        Veiculo veiculo = veiculoRepository.findByUsuario_IdUsuario(idUsuario)
-                . orElseThrow(() -> new RegraDeNegociosException("Veículo não encontrado para o usuário"));
+        List<Veiculo> veiculos = veiculoRepository.findAllByUsuario_IdUsuario(idUsuario);
+        List<VeiculoDTO>veiculoDTOS = new ArrayList<VeiculoDTO>();
 
+        for(Veiculo veiculo : veiculos){
+            veiculoDTOS.add(new VeiculoDTO(
+                            veiculo.getIdVeiculo(),
+                            veiculo.getModeloCarro(),
+                            veiculo.getNomeMarca())
+                    );
+        }
 
-
-        return new VeiculoDTO(
-                veiculo.getIdVeiculo(),
-                veiculo.getModeloCarro(),
-                veiculo.getNomeMarca()
-        );
-
-
+        return veiculoDTOS;
 
     }
 }

@@ -3,7 +3,6 @@ package br.projeto_integrador.aplicativo.backend.ocpp.controller;
 
 import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarCarregadorDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.CarregadorDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.ConectorDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStartDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStopDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.UnlockConnectorDTO;
@@ -25,7 +24,8 @@ public class CarregadorController {
     private final CarregadorService carregadorService;
     private final SecurityUtils securityUtils;
 
-    public CarregadorController(OcppClientService ocppClientService, CarregadorService carregadorService, SecurityUtils securityUtils) {
+    public CarregadorController(OcppClientService ocppClientService, CarregadorService carregadorService,
+                                SecurityUtils securityUtils) {
         this.ocppClientService = ocppClientService;
         this.carregadorService = carregadorService;
         this.securityUtils = securityUtils;

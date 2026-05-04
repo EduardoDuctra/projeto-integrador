@@ -3,6 +3,8 @@ package br.projeto_integrador.aplicativo.backend.websocket;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class WebSocketObserver implements Observer {
 
@@ -16,6 +18,7 @@ public class WebSocketObserver implements Observer {
 
     @Override
     public void atualizar(Long idUsuario) {
+
         messagingTemplate.convertAndSend(
                 "/topic/usuario/" + idUsuario,
                 "atualização de estado"
@@ -38,5 +41,13 @@ public class WebSocketObserver implements Observer {
         );
     }
 
+
+    @Override
+    public void atualizarSaldo(Long idUsuario, BigDecimal saldo) {
+        messagingTemplate.convertAndSend(
+                "/topic/usuario/saldo/" + idUsuario,
+                saldo
+        );
+    }
 
 }

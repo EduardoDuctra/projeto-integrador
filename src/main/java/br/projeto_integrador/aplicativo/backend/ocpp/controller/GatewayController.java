@@ -26,7 +26,8 @@ public class GatewayController {
     private final TransacaoService transacaoService;
 
 
-    public GatewayController(CarregadorService carregadorService, ConectorService conectorService, TransacaoService transacaoService, SecurityUtils securityUtils, OcppClientService ocppClientService) {
+    public GatewayController(CarregadorService carregadorService, ConectorService conectorService,
+                             TransacaoService transacaoService) {
         this.carregadorService = carregadorService;
         this.conectorService = conectorService;
         this.transacaoService = transacaoService;

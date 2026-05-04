@@ -29,7 +29,8 @@ public class AutenticacaoController {
     private final AutenticacaoService autenticacaoService;
 
     public AutenticacaoController(AuthenticationManager authenticationManager,
-                                  TokenServiceJWT tokenServiceJWT, UsuarioRepository usuarioRepository, TokenServiceGoogle tokenServiceGoogle, UsuarioService usuarioService, AutenticacaoService autenticacaoService) {
+                                  TokenServiceJWT tokenServiceJWT, TokenServiceGoogle tokenServiceGoogle,
+                                  UsuarioService usuarioService, AutenticacaoService autenticacaoService) {
         this.authenticationManager = authenticationManager;
         this.tokenServiceJWT = tokenServiceJWT;
         this.autenticacaoService = autenticacaoService;
@@ -61,6 +62,12 @@ public class AutenticacaoController {
         }
     }
 
+    /**
+     * validação com o google. Fornece apenas Nome e Email. Demais dados tem que ser
+     * preenchidos manualmente pelo usuário
+     * @param dto
+     * @return DadosTokenJWTDTO
+     */
     @PostMapping("/google")
     public ResponseEntity<?> loginGoogle(@RequestBody TokenGoogleDTO dto) {
 
@@ -81,6 +88,11 @@ public class AutenticacaoController {
 
     }
 
+    /**
+     * apenas envia o código de recuperação para o email
+     * @param dto
+     * @return String
+     */
     @PostMapping("/esqueci-senha")
     public ResponseEntity<String> esqueciSenha(@RequestBody EsqueciSenhaDTO dto) {
         usuarioService.enviarCodigoRecuperacao(dto.email());
@@ -88,6 +100,11 @@ public class AutenticacaoController {
     }
 
 
+    /**
+     * pega o codigo de recuperação + email + nova senha e atualiza
+     * @param dto
+     * @return String
+     */
     @PostMapping("/redefinir-senha")
     public ResponseEntity<String> redefinirSenha(@RequestBody NovaSenhaDTO dto) {
 

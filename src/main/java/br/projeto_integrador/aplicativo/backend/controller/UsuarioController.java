@@ -33,6 +33,13 @@ public class UsuarioController {
 
     }
 
+    /**
+     * Recebe o arquivo foto e atualiza a foto
+     * não funciona junto com o metodo de atualizar os dados -> service separado
+     * @param request
+     * @param foto
+     * @return String
+     */
     @PostMapping("/logado/foto")
     public ResponseEntity<String> uploadFoto(HttpServletRequest request,
                                              @RequestParam("foto") MultipartFile foto
@@ -45,6 +52,10 @@ public class UsuarioController {
     }
 
 
+    /**
+     * lista os usuarios do sistema -> APENAS DESENVOLVIMENTO
+     * @return <List<UsuarioCompletoDTO>
+     */
     @GetMapping("/listar-usuarios")
     public ResponseEntity<List<UsuarioCompletoDTO>>listarUsuarios(){
         List<UsuarioCompletoDTO> usuarios = this.usuarioService.listarUsuarios();
@@ -55,6 +66,11 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(usuarios);
     }
 
+    /**
+     * busca o usuario logado no banco de dados
+     * @param request
+     * @return UsuarioCompletoDTO
+     */
     @GetMapping("/logado")
     public ResponseEntity<UsuarioCompletoDTO>buscarUsuarioLogado(HttpServletRequest request){
 
@@ -90,6 +106,12 @@ public class UsuarioController {
     }
 
 
+    /**
+     * atualiza os dados do usuário
+     * @param request
+     * @param dto
+     * @return UsuarioDTO
+     */
     @PutMapping("/atualizar/logado")
     public ResponseEntity<UsuarioDTO> atualizarUsuario(HttpServletRequest request,
                                                        @RequestBody UsuarioCompletoDTO dto) {
@@ -101,6 +123,13 @@ public class UsuarioController {
 
     }
 
+    /**
+     * atualiza o veículo principal do usuário -> o que vai ser salvo na transação atual
+     * usa a lista de veículos dele
+     * @param request
+     * @param idVeiculo
+     * @return String
+     */
     @PutMapping("/atualizar-veiculo/{idVeiculo}")
     public ResponseEntity<String> atualizarVeiculoPrincipal(HttpServletRequest request,
                                                             @PathVariable Long idVeiculo){
@@ -112,7 +141,11 @@ public class UsuarioController {
     }
 
 
-
+    /**
+     * soft delete
+     * @param request
+     * @return void
+     */
     @DeleteMapping("/deletar/logado")
     public ResponseEntity<Void> deletarUsuario(HttpServletRequest request) {
 

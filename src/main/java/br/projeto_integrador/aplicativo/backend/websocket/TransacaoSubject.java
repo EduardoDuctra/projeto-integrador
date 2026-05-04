@@ -2,6 +2,7 @@ package br.projeto_integrador.aplicativo.backend.websocket;
 
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,12 @@ public class TransacaoSubject {
     public void notificarTodosCarregadores(){
         for (Observer o : observers){
             o.atualizarTodosCarregadores();
+        }
+    }
+
+    public void notificarSaldo(Long idUsuario, BigDecimal saldo) {
+        for (Observer o : observers) {
+            o.atualizarSaldo(idUsuario, saldo);
         }
     }
 }

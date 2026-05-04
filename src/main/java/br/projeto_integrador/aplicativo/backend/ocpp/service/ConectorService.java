@@ -38,7 +38,8 @@ public class ConectorService {
 
 
 
-    public ConectorService(CarregadorRepository carregadorRepository, ConectorRepository conectorRepository, UsuarioService usuarioService, TransacaoRepository transacaoRepository, TransacaoSubject transacaoSubject) {
+    public ConectorService(CarregadorRepository carregadorRepository, ConectorRepository conectorRepository,
+                           UsuarioService usuarioService, TransacaoRepository transacaoRepository, TransacaoSubject transacaoSubject) {
         this.carregadorRepository = carregadorRepository;
         this.conectorRepository = conectorRepository;
         this.usuarioService = usuarioService;
@@ -49,6 +50,7 @@ public class ConectorService {
 
 
 
+    //processar se o conector ta cadastrado ou não quando recebe o payloa
     public void processarConector(StatusNotificationDTO payload){
 
         String idCharger = payload.charger_id();
@@ -129,6 +131,11 @@ public class ConectorService {
     }
 
 
+    /**
+     * atualiza o conector CC/CA e valor energia
+     * @param dto
+     * @return
+     */
     public String atualizarInformacoes(AtualizarConectorDTO dto) {
 
         if(dto.charger_id() == null){
@@ -245,6 +252,7 @@ public class ConectorService {
                         c.getConnectorIdNoCarregador(),
                         c.getTipo(),
                         true,
+                        c.getValorEnergia(),
                         c.getNomeConector(),
                         c.getCarregador().getIdCarregador()
                 );
@@ -259,7 +267,12 @@ public class ConectorService {
 
 
 
-    //lista Retorna o conector da transação ativa
+    /**
+     * Retorna o conector da transação ativa
+     * usado nos últimos 5min -> fica nessa tela por 5min após pausar pq pode ser necessário forçar a remoção
+     * @param id
+     * @return
+     */
     public ConectorDTO listarTransacaoAtivaRecentementePorUsuario(Long id) {
 
         Usuario usuario = usuarioService.buscarPorId(id);
@@ -286,6 +299,7 @@ public class ConectorService {
                     c.getConnectorIdNoCarregador(),
                     c.getTipo(),
                     c.isDisponivelUso(),
+                    c.getValorEnergia(),
                     c.getNomeConector(),
                     c.getCarregador().getIdCarregador()
             );

@@ -1,0 +1,16 @@
+CARTÃO TESTE
+
+número: 5031 4332 1540 6351
+código: 123
+validade: 11/30
+cpf: 12345678909
+Nome: APRO
+
+
+Logar guia anonima -> ai entrar com a url do link
+
+TESTUSER3060585959355656145
+
+senha: qN5IiJbTTY
+
+codigo verificacao: 667233

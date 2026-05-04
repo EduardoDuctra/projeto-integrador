@@ -7,6 +7,7 @@ public record ConectorDTO(Long id,
                           Integer connectorIdNoCarregador,
                           TipoConector tipo,
                           boolean disponivelUso,
+                          Double valorEnergia,
                           NomeConector nomeConector,
                           String idCarregador) {
 }

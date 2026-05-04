@@ -41,7 +41,9 @@ public class OcppClientService {
 
 
 
-    public OcppClientService(RestTemplate restTemplate, OcppTokenService tokenService, UsuarioRepository usuarioRepository, ConectorRepository conectorRepository, TransacaoRepository transacaoRepository, ConectorService conectorService) {
+    public OcppClientService(RestTemplate restTemplate, OcppTokenService tokenService,
+                             UsuarioRepository usuarioRepository, ConectorRepository conectorRepository,
+                             TransacaoRepository transacaoRepository, ConectorService conectorService) {
         this.restTemplate = restTemplate;
         this.tokenService = tokenService;
         this.usuarioRepository = usuarioRepository;

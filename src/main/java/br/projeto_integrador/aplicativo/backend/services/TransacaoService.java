@@ -1,12 +1,13 @@
 package br.projeto_integrador.aplicativo.backend.services;
 
-import br.projeto_integrador.aplicativo.backend.model.dto.ConectorDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
-import br.projeto_integrador.aplicativo.backend.model.enums.StatusNotification;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
-import br.projeto_integrador.aplicativo.backend.ocpp.dto.*;
+import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValueDTO;
+import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValuesCompletoDTO;
+import br.projeto_integrador.aplicativo.backend.ocpp.dto.RemoteStopDTO;
+import br.projeto_integrador.aplicativo.backend.ocpp.dto.SampledValueDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.OcppClientService;
 import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class TransacaoService {
@@ -29,7 +29,9 @@ public class TransacaoService {
 
 
 
-    public TransacaoService(TransacaoRepository transacaoRepository, ConectorRepository conectorRepository, OcppClientService ocppClientService, TransacaoFinanceiraService transacaoFinanceiraService, TransacaoSubject transacaoSubject) {
+    public TransacaoService(TransacaoRepository transacaoRepository, ConectorRepository conectorRepository,
+                            OcppClientService ocppClientService, TransacaoFinanceiraService transacaoFinanceiraService,
+                            TransacaoSubject transacaoSubject) {
         this.transacaoRepository = transacaoRepository;
         this.conectorRepository = conectorRepository;
         this.ocppClientService = ocppClientService;
@@ -198,6 +200,7 @@ public class TransacaoService {
         transacaoSubject.notificar(transacao.getUsuario().getIdUsuario());
     }
 
+    //verifica se tem saldo a cada atualização -> se não tiver, cancela recarga
     public boolean usuarioSaldo(Transacao transacao){
 
         Usuario usuario = transacao.getUsuario();
