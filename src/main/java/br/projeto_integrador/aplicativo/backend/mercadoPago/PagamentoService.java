@@ -91,7 +91,7 @@ public class PagamentoService {
 //                                            .pending("https://google.com")
 //                                            .build()
 //                            )
-                            .autoReturn("all")
+//                            .autoReturn("all")
                             .build();
 
 
