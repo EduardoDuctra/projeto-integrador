@@ -4,11 +4,13 @@ import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosExcepti
 import br.projeto_integrador.aplicativo.backend.model.dto.VeiculoDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.entity.Veiculo;
+import br.projeto_integrador.aplicativo.backend.model.enums.StatusUsuario;
 import br.projeto_integrador.aplicativo.backend.repositories.VeiculoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VeiculoService {
@@ -23,7 +25,7 @@ public class VeiculoService {
     }
 
 
-    public VeiculoDTO cadastrarOuAtualizarVeiculoAoUsuario(Long idUsuario, VeiculoDTO dto) {
+    public VeiculoDTO cadastrarVeiculoAoUsuario(Long idUsuario, VeiculoDTO dto) {
 
         Usuario usuario = usuarioService.buscarPorId(idUsuario);
 
@@ -33,7 +35,8 @@ public class VeiculoService {
 
 
 
-        Veiculo veiculo = veiculoRepository.findByUsuario_IdUsuario(idUsuario).orElse(new Veiculo());
+        Veiculo veiculo = new Veiculo();
+
         veiculo.setUsuario(usuario);
         veiculo.setModeloCarro(dto.modeloCarro());
         veiculo.setNomeMarca(dto.nomeMarca());
@@ -66,6 +69,20 @@ public class VeiculoService {
         }
 
         return veiculoDTOS;
+
+    }
+
+    public void deletarVeiculo(Long idVeiculo) {
+
+            Optional<Veiculo> veiculo = veiculoRepository.findById(idVeiculo);
+
+            if(veiculo.isEmpty()){
+
+                throw new RegraDeNegociosException("Veículo não encontrado");
+
+            }
+            veiculoRepository.deleteById(idVeiculo);
+
 
     }
 }

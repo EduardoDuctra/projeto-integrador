@@ -9,17 +9,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/veiculo")
 public class VeiculoController {
 
     private final VeiculoService service;
     private final SecurityUtils securityUtils;
+    private final VeiculoService veiculoService;
 
     public VeiculoController(VeiculoService service,
-                              SecurityUtils securityUtils) {
+                             SecurityUtils securityUtils, VeiculoService veiculoService) {
         this.service = service;
         this.securityUtils = securityUtils;
+        this.veiculoService = veiculoService;
     }
 
 
@@ -33,7 +36,7 @@ public class VeiculoController {
     public ResponseEntity<VeiculoDTO> cadastraOuAtualizarVeiculoAoUsuario(HttpServletRequest request, @RequestBody VeiculoDTO dto) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
-        VeiculoDTO veiculo = service.cadastrarOuAtualizarVeiculoAoUsuario(id, dto);
+        VeiculoDTO veiculo = service.cadastrarVeiculoAoUsuario(id, dto);
 
         return ResponseEntity.status(201).body(veiculo);
 
@@ -55,8 +58,18 @@ public class VeiculoController {
             return ResponseEntity.status(404).body(veiculos);
         }
 
-        return ResponseEntity.status(201).body(veiculos);
+        return ResponseEntity.status(200).body(veiculos);
 
+    }
+
+
+    @DeleteMapping("/deletar/{idVeiculo}")
+    public ResponseEntity<Void> deletarUsuario(HttpServletRequest request, @PathVariable Long idVeiculo) {
+
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
+        veiculoService.deletarVeiculo(idVeiculo);
+
+        return ResponseEntity.noContent().build();
     }
 
 
