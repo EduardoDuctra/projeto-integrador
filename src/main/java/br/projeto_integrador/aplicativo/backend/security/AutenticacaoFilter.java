@@ -69,7 +69,6 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
             } catch (RuntimeException e) {
                 System.out.println("Token inválido ou expirado: " + e.getMessage());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
