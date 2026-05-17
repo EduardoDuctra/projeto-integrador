@@ -1,7 +1,9 @@
 package br.projeto_integrador.aplicativo.backend.controller;
 
-import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCompletoDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.CriarUsuarioDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.SenhaAtualizarDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioResponseDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
@@ -26,9 +28,9 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<UsuarioDTO> criarUsuario(@RequestBody UsuarioCompletoDTO dto) {
+    public ResponseEntity<UsuarioResponseDTO> criarUsuario(@RequestBody CriarUsuarioDTO dto) {
 
-       UsuarioDTO usarioSalvo = usuarioService.criarUsuario(dto);
+       UsuarioResponseDTO usarioSalvo = usuarioService.criarUsuario(dto);
        return ResponseEntity.status(201).body(usarioSalvo);
 
     }
@@ -57,8 +59,8 @@ public class UsuarioController {
      * @return <List<UsuarioCompletoDTO>
      */
     @GetMapping("/listar-usuarios")
-    public ResponseEntity<List<UsuarioCompletoDTO>>listarUsuarios(){
-        List<UsuarioCompletoDTO> usuarios = this.usuarioService.listarUsuarios();
+    public ResponseEntity<List<UsuarioDTO>>listarUsuarios(){
+        List<UsuarioDTO> usuarios = this.usuarioService.listarUsuarios();
 
         if(usuarios.isEmpty()){
             return ResponseEntity.status(404).body(usuarios);
@@ -72,7 +74,7 @@ public class UsuarioController {
      * @return UsuarioCompletoDTO
      */
     @GetMapping("/logado")
-    public ResponseEntity<UsuarioCompletoDTO>buscarUsuarioLogado(HttpServletRequest request){
+    public ResponseEntity<UsuarioDTO>buscarUsuarioLogado(HttpServletRequest request){
 
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
@@ -89,7 +91,7 @@ public class UsuarioController {
         }
 
 
-        UsuarioCompletoDTO dto = new UsuarioCompletoDTO(
+        UsuarioDTO dto = new UsuarioDTO(
                 usuario.getIdUsuario(),
                 usuario.getNome(),
                 usuario.getCpf(),
@@ -97,7 +99,7 @@ public class UsuarioController {
                 usuario.getEmail(),
                 usuario.getFotoUrl(),
                 usuario.getSaldo(),
-                null,
+                usuario.isCadastroCompleto(),
                 idVeiculo,
                 modeloVeiculo);
 
@@ -113,11 +115,23 @@ public class UsuarioController {
      * @return UsuarioDTO
      */
     @PutMapping("/atualizar/logado")
-    public ResponseEntity<UsuarioDTO> atualizarUsuario(HttpServletRequest request,
-                                                       @RequestBody UsuarioCompletoDTO dto) {
+    public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(HttpServletRequest request,
+                                                               @RequestBody UsuarioDTO dto) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
-        UsuarioDTO atualizado = usuarioService.atualizarUsuario(id, dto);
+        UsuarioResponseDTO atualizado = usuarioService.atualizarUsuario(id, dto);
+
+        return ResponseEntity.ok(atualizado);
+
+    }
+
+
+    @PutMapping("/atualizar/senha")
+    public ResponseEntity<String> atualizarSenha(HttpServletRequest request,
+                                                               @RequestBody SenhaAtualizarDTO dto) {
+
+        Long id = securityUtils.getUsuarioPeloIdToken(request);
+        String atualizado = usuarioService.atualizarSenha(id, dto);
 
         return ResponseEntity.ok(atualizado);
 

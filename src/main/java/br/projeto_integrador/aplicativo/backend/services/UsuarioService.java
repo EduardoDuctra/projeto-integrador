@@ -2,9 +2,7 @@ package br.projeto_integrador.aplicativo.backend.services;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import br.projeto_integrador.aplicativo.backend.model.CodigoRecuperacao;
-import br.projeto_integrador.aplicativo.backend.model.dto.GoogleUserInfoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioCompletoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.*;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.entity.Veiculo;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusUsuario;
@@ -38,7 +36,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioDTO criarUsuario (UsuarioCompletoDTO dto){
+    public UsuarioResponseDTO criarUsuario (CriarUsuarioDTO dto){
 
         if(usuarioRepository.existsByEmail(dto.email())){
             throw new RegraDeNegociosException("Email já cadastrado");
@@ -56,22 +54,23 @@ public class UsuarioService {
         usuario.setEmail(dto.email());
         usuario.setStatus(StatusUsuario.ATIVO);
         usuario.setSaldo(BigDecimal.valueOf(0.0));
+        usuario.setCadastroCompleto(true);
 
         usuario.setSenha(new BCryptPasswordEncoder().encode(dto.senha()));
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
 
-        return new UsuarioDTO(
+        return new UsuarioResponseDTO(
                 usuarioSalvo.getIdUsuario(),
                 usuarioSalvo.getNome(),
                 usuarioSalvo.getEmail()
         );
     }
 
-    public List<UsuarioCompletoDTO> listarUsuarios() {
+    public List<UsuarioDTO> listarUsuarios() {
 
         List<Usuario> usuarios = usuarioRepository.findAll();
-        List<UsuarioCompletoDTO> listaUsuarios = new ArrayList<>();
+        List<UsuarioDTO> listaUsuarios = new ArrayList<>();
 
         for (Usuario usuario : usuarios) {
 
@@ -89,7 +88,7 @@ public class UsuarioService {
                 modeloVeiculo = usuario.getVeiculoPrincipal().getModeloCarro();
             }
 
-            listaUsuarios.add(new UsuarioCompletoDTO(
+            listaUsuarios.add(new UsuarioDTO(
                     usuario.getIdUsuario(),
                     usuario.getNome(),
                     usuario.getCpf(),
@@ -97,7 +96,7 @@ public class UsuarioService {
                     usuario.getEmail(),
                     usuario.getFotoUrl(),
                     usuario.getSaldo(),
-                    null,
+                    usuario.isCadastroCompleto(),
                     idVeiculo,
                     modeloVeiculo
             ));
@@ -115,7 +114,7 @@ public class UsuarioService {
 
 
     @Transactional
-    public UsuarioDTO  atualizarUsuario(Long id, UsuarioCompletoDTO dto) {
+    public UsuarioResponseDTO atualizarUsuario(Long id, UsuarioDTO dto) {
 
         Usuario usuario = null;
         try {
@@ -132,18 +131,45 @@ public class UsuarioService {
             usuario.setTelefone(dto.telefone());
         }
 
+        if(dto.cpf() != null){
+            usuario.setCpf(dto.cpf());
+        }
+
+        if(!usuario.isCadastroCompleto()){
+            usuario.setCadastroCompleto(true);
+        }
+
+
+        Usuario atualizado = usuarioRepository.save(usuario);
+
+        return new UsuarioResponseDTO(
+                atualizado.getIdUsuario(),
+                atualizado.getNome(),
+                atualizado.getEmail()
+        );
+
+    }
+
+    @Transactional
+    public String atualizarSenha(Long id, SenhaAtualizarDTO dto) {
+
+        Usuario usuario = null;
+        try {
+            usuario = buscarPorId(id);
+        } catch (Exception e) {
+            throw new RegraDeNegociosException("Usuário não encontrado");
+        }
+
 
         if (dto.senha() != null && !dto.senha().isBlank()) {
             usuario.setSenha(new BCryptPasswordEncoder().encode(dto.senha()));
         }
 
+        System.out.println("Senha atualizada");
+
         Usuario atualizado = usuarioRepository.save(usuario);
 
-        return new UsuarioDTO(
-                atualizado.getIdUsuario(),
-                atualizado.getNome(),
-                atualizado.getEmail()
-        );
+        return "Senha atualizada para o usuario: " + atualizado.getIdUsuario();
 
     }
 
