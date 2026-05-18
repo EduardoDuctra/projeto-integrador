@@ -287,7 +287,7 @@ public class ConectorService {
 
         LocalDateTime agora = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
-        LocalDateTime cincoMinutos = agora.minusMinutes(5);
+        LocalDateTime cincoMinutos = agora.minusMinutes(60);
 
 
         if (t.getDataFim().isAfter(cincoMinutos)) {

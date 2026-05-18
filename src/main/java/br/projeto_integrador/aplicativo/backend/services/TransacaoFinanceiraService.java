@@ -172,7 +172,9 @@ public class TransacaoFinanceiraService {
 
         for (Transacao transacaoFinanceira : transacoes) {
 
-            if(transacaoFinanceira.getTipoTransacao().equals(TipoTransacao.DEBITO)) {
+            if(transacaoFinanceira.getTipoTransacao().equals(TipoTransacao.DEBITO) &&
+                    transacaoFinanceira.getEnergiaConsumida()!=null && transacaoFinanceira.getValorRecarga()!=null
+            ) {
 
                 TransacaoDebitoDTO dto = new TransacaoDebitoDTO(
                         transacaoFinanceira.getValorRecarga(),

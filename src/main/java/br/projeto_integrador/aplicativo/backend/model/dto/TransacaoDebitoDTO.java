@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record TransacaoDebitoDTO(BigDecimal valorRecarga,
-                                 double recargaKwh,
+                                 Double recargaKwh,
                                  LocalDateTime dataInicio,
                                  String modelo) {
 }
