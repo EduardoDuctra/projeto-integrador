@@ -1,8 +1,15 @@
 package br.projeto_integrador.aplicativo.backend.mercadoPago;
 
 
+import br.projeto_integrador.aplicativo.backend.model.dto.VeiculoDTO;
 import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/webhook")
+@Tag(name = "Webhook", description = "Path relacionado ao Webhook - MercadoPago")
 public class WebhookController {
 
     @Value("${api.mercado.pago.token}")
@@ -36,6 +44,11 @@ public class WebhookController {
      * @return String
      */
     @PostMapping
+    @Operation(summary = "Recebe um webhook", description = "Recebe um webhook quando o pagamento é confirmado e processa o pagamento no BD")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Webhook processado com sucesso",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))),
+    })
     public ResponseEntity<String> receberWebhook(@RequestBody WebhookDTO webhookDTO) {
 
         System.out.println("WEBHOOK CHEGOU!");

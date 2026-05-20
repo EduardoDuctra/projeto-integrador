@@ -7,6 +7,12 @@ import br.projeto_integrador.aplicativo.backend.model.dto.UsuarioResponseDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +23,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/usuario")
+@Tag(name = "Usuário", description = "Path relacionado ao usuário")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -28,6 +35,14 @@ public class UsuarioController {
     }
 
     @PostMapping
+    @Operation(summary = "Criar um usuário", description = "Criar um usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioResponseDTO.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Email ou CPF já cadastrados")
+    })
     public ResponseEntity<UsuarioResponseDTO> criarUsuario(@RequestBody CriarUsuarioDTO dto) {
 
        UsuarioResponseDTO usarioSalvo = usuarioService.criarUsuario(dto);
@@ -43,6 +58,12 @@ public class UsuarioController {
      * @return String
      */
     @PostMapping("/logado/foto")
+    @Operation(summary = "Atualizar foto do usuário", description = "Atualizar foto do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "URL da foto retornada com sucesso",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string")
+                    )),
+    })
     public ResponseEntity<String> uploadFoto(HttpServletRequest request,
                                              @RequestParam("foto") MultipartFile foto
     ) {
@@ -59,6 +80,14 @@ public class UsuarioController {
      * @return <List<UsuarioCompletoDTO>
      */
     @GetMapping("/listar-usuarios")
+    @Operation(summary = "Listar os usuários - DESENVOLVIMENTO", description = "Listar os usuários - DESENVOLVIMENTO")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuários encontrados",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioDTO.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "Nenhum usuário encontrado")
+    })
     public ResponseEntity<List<UsuarioDTO>>listarUsuarios(){
         List<UsuarioDTO> usuarios = this.usuarioService.listarUsuarios();
 
@@ -74,6 +103,13 @@ public class UsuarioController {
      * @return UsuarioCompletoDTO
      */
     @GetMapping("/logado")
+    @Operation(summary = "Retornar o usuário logado", description = "Retornar o usuário logado com base no token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuários encontrados",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioDTO.class))
+            ),
+    })
     public ResponseEntity<UsuarioDTO>buscarUsuarioLogado(HttpServletRequest request){
 
 
@@ -115,6 +151,13 @@ public class UsuarioController {
      * @return UsuarioDTO
      */
     @PutMapping("/atualizar/logado")
+    @Operation(summary = "Atualizar os dados do usuário", description = "Atualizar os dados do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UsuarioResponseDTO.class))
+            ),
+    })
     public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(HttpServletRequest request,
                                                                @RequestBody UsuarioDTO dto) {
 
@@ -127,6 +170,13 @@ public class UsuarioController {
 
 
     @PutMapping("/atualizar/senha")
+    @Operation(summary = "Atualizar a senha do usuário", description = "Atualizar a senha do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Senha atualizada com sucesso",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(type = "string"))
+            ),
+    })
     public ResponseEntity<String> atualizarSenha(HttpServletRequest request,
                                                                @RequestBody SenhaAtualizarDTO dto) {
 
@@ -145,6 +195,15 @@ public class UsuarioController {
      * @return String
      */
     @PutMapping("/atualizar-veiculo/{idVeiculo}")
+    @Operation(summary = "Atualizar o veículo principal do usuário", description = "Atualizar o veículo principal do usuário. Recebe o ID do veículo pela URL")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Veículo alterado com sucesso",
+                    content = @Content(mediaType = "text/plain",
+                            schema = @Schema(type = "string"))
+            ),
+            @ApiResponse(responseCode = "400", description = "Usuário ou veículo não encontrado")
+
+    })
     public ResponseEntity<String> atualizarVeiculoPrincipal(HttpServletRequest request,
                                                             @PathVariable Long idVeiculo){
 
@@ -161,6 +220,15 @@ public class UsuarioController {
      * @return void
      */
     @DeleteMapping("/deletar/logado")
+    @Operation(summary = "Desativa o perfil do usuário usuário", description = "Desativa o perfil do usuário usuário")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Usuário desativado com sucesso"
+            )
+
+
+    })
     public ResponseEntity<Void> deletarUsuario(HttpServletRequest request) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);

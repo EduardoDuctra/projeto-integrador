@@ -1,12 +1,15 @@
 package br.projeto_integrador.aplicativo.backend.ocpp.controller;
 
-import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarCarregadorDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarConectorDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.ConectorDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.VeiculoDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.*;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.ConectorService;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.TransacaoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/conector")
+@Tag(name = "Conector", description = "Path relacionado ao conector")
 public class ConcectorController {
 
     private final ConectorService conectorService;
@@ -35,6 +39,11 @@ public class ConcectorController {
      * @return
      */
     @PutMapping("/atualizar-conector")
+    @Operation(summary = "Atualizar informações do conector", description = "Atualizar informações do conector")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Conector atualizado com sucesso",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))),
+    })
     public ResponseEntity<String> atualizarInformacoes(@RequestBody AtualizarConectorDTO dto){
 
         String response = conectorService.atualizarInformacoes(dto);
@@ -50,6 +59,12 @@ public class ConcectorController {
      * @return ConectorDTO
      */
     @GetMapping("/usado-recentemente-pelo-usuario")
+    @Operation(summary = "Listar o conector usado recentemente pelo usuário",
+            description = "Listar o conector usado recentemente pelo usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Conector atualizado com sucesso",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConectorDTO.class))),
+    })
     public ResponseEntity<ConectorDTO> conectorUsadoRecentemente(HttpServletRequest request){
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
@@ -69,6 +84,13 @@ public class ConcectorController {
      * @return List<ConectorDTO>
      */
     @GetMapping("/disponiveis/{idCarregador}")
+    @Operation(summary = "Listar os conectores disponíveis",
+            description = "Listar os conectores disponíveis")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Conectores encontrados com sucesso",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ConectorDTO.class))),
+            @ApiResponse(responseCode = "204", description = "Nenhum conector disponível encontrado")
+    })
     public ResponseEntity<List<ConectorDTO>>conectoresDisponiveis(@PathVariable String idCarregador){
 
         List<ConectorDTO> lista = conectorService.conectoresPorCarregador(idCarregador);

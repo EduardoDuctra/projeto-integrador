@@ -38,6 +38,11 @@ public class SecurityConfig {
                         .requestMatchers("/teste.html").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/webhook/**").permitAll()
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
 

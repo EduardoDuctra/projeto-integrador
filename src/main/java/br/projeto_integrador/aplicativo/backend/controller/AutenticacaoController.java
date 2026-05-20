@@ -8,6 +8,12 @@ import br.projeto_integrador.aplicativo.backend.security.TokenServiceJWT;
 import br.projeto_integrador.aplicativo.backend.security.TokenServiceGoogle;
 import br.projeto_integrador.aplicativo.backend.services.AutenticacaoService;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/login")
+@Tag(name = "Autenticação", description = "Path relacionado a autenticação")
 public class AutenticacaoController {
 
     private final AuthenticationManager authenticationManager;
@@ -39,6 +46,12 @@ public class AutenticacaoController {
     }
 
     @PostMapping
+    @Operation(summary = "Realizar o login", description = "Realiza o login com email e senha")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DadosTokenJWTDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Usuário ou senha incorretos", content = @Content)
+    })
     public ResponseEntity<?> efetuarLogin(@RequestBody @Valid DadosAutenticacaoDTO dados) {
 
         System.out.println("Tentativa de login com email: " + dados.email());
@@ -69,6 +82,12 @@ public class AutenticacaoController {
      * @return DadosTokenJWTDTO
      */
     @PostMapping("/google")
+    @Operation(summary = "Realizar o login via Google", description = "Realiza o login via Google")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login via Google realizado com sucesso",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DadosTokenJWTDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Token Google inválido", content = @Content)
+    })
     public ResponseEntity<?> loginGoogle(@RequestBody TokenGoogleDTO dto) {
 
         // valida dados do google
@@ -94,6 +113,12 @@ public class AutenticacaoController {
      * @return String
      */
     @PostMapping("/esqueci-senha")
+    @Operation(summary = "Envia o código de recuperação para o email", description = "Envia o código de recuperação para o email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Código enviado",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "400", description = "Usuário não encontrado", content = @Content)
+    })
     public ResponseEntity<String> esqueciSenha(@RequestBody EsqueciSenhaDTO dto) {
         usuarioService.enviarCodigoRecuperacao(dto.email());
         return ResponseEntity.ok("Código enviado");
@@ -106,6 +131,12 @@ public class AutenticacaoController {
      * @return String
      */
     @PostMapping("/redefinir-senha")
+    @Operation(summary = "Envia o código de recuperação para o email", description = "Envia o código de recuperação para o email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Senha atualizada",
+                    content = @Content(mediaType = "text/plain", schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "400", description = "Código não encontrado", content = @Content)
+    })
     public ResponseEntity<String> redefinirSenha(@RequestBody NovaSenhaDTO dto) {
 
         usuarioService.redefinirSenha(dto.email(), dto.codigo(), dto.novaSenha());

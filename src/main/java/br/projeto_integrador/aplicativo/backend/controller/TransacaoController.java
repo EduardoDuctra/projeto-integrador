@@ -3,12 +3,15 @@ package br.projeto_integrador.aplicativo.backend.controller;
 
 import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import br.projeto_integrador.aplicativo.backend.mercadoPago.PagamentoService;
-import br.projeto_integrador.aplicativo.backend.model.dto.AtualizarValorMaximoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoAtivaDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoCreditoDTO;
-import br.projeto_integrador.aplicativo.backend.model.dto.TransacaoDebitoDTO;
+import br.projeto_integrador.aplicativo.backend.model.dto.*;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.TransacaoFinanceiraService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/transacao")
+@Tag(name = "Transacao", description = "Path relacionado as transações")
 public class TransacaoController {
 
 
@@ -44,6 +48,12 @@ public class TransacaoController {
      * @return String
      */
     @PostMapping
+    @Operation(summary = "Criar uma transação de crédito", description = "Criar uma transação de crédito")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Link de pagamento do mercado pago",
+                    content = @Content(mediaType = "text/plain",  schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "400", description = "Erro ao validar transação de crédito")
+    })
     public ResponseEntity<String> criarTransacao(HttpServletRequest request,
                                                               @RequestBody TransacaoCreditoDTO transacaoDTO) {
 
@@ -77,6 +87,11 @@ public class TransacaoController {
      * @return AtualizarValorMaximoDTO
      */
     @PatchMapping("/{idTransacao}/valor-maximo")
+    @Operation(summary = "Atualiza o valor máximo da recarga", description = "Atualiza o valor máximo da recarga. Recebe o ID da transação pela URL")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Valor máximo atualizado com sucesso",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AtualizarValorMaximoDTO.class))),
+    })
     public ResponseEntity<AtualizarValorMaximoDTO> atualizarValorMaximoTransacao(HttpServletRequest request,
                                                                                  @PathVariable Long idTransacao,
                                                                                  @RequestBody AtualizarValorMaximoDTO dto) {
@@ -93,6 +108,13 @@ public class TransacaoController {
      * @return <List<TransacaoCreditoDTO>
      */
     @GetMapping("/listar-transacoes-credito")
+    @Operation(summary = "Lista as transações de crédito do usuário",
+            description = "Lista as transações de crédito do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista com as transações",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransacaoCreditoDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Nenhuma transação encontrada")
+    })
     public ResponseEntity<List<TransacaoCreditoDTO>>listarTransacoes(HttpServletRequest request) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
@@ -113,6 +135,13 @@ public class TransacaoController {
      * @return <List<TransacaoDebitoDTO>
      */
     @GetMapping("/listar-transacoes-debito")
+    @Operation(summary = "Lista as transações de débito do usuário",
+            description = "Lista as transações de débito do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista com as transações",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransacaoDebitoDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Nenhuma transação encontrada")
+    })
     public ResponseEntity<List<TransacaoDebitoDTO>>listarTransacoesDebito(HttpServletRequest request) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
@@ -130,6 +159,13 @@ public class TransacaoController {
      * @return
      */
     @GetMapping("/listar-transacao-ativa")
+    @Operation(summary = "Lista a transação ativa",
+            description = "Lista a transação ativa")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista a trasanção",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = TransacaoAtivaDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Nenhuma transação encontrada")
+    })
     public ResponseEntity<TransacaoAtivaDTO>listarTransacaoAtiva(HttpServletRequest request) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);

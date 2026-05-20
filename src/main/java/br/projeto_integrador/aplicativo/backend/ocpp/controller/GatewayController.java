@@ -1,11 +1,18 @@
 package br.projeto_integrador.aplicativo.backend.ocpp.controller;
 
+import br.projeto_integrador.aplicativo.backend.model.dto.DadosAutenticacaoDTO;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.*;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.CarregadorService;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.ConectorService;
 import br.projeto_integrador.aplicativo.backend.ocpp.service.OcppClientService;
 import br.projeto_integrador.aplicativo.backend.security.SecurityUtils;
 import br.projeto_integrador.aplicativo.backend.services.TransacaoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +26,7 @@ import java.util.Map;
 //é essa classe que entra os dados servidor em python
 @RestController
 @RequestMapping("/backend")
+@Tag(name = "Gateway", description = "Path relacionado a entrada de dados do servidor OCPP")
 public class GatewayController {
 
     private final CarregadorService carregadorService;
@@ -35,6 +43,10 @@ public class GatewayController {
 
     //info do carregador
     @PostMapping("/bootNotification")
+    @Operation(summary = "Informações do carregador", description = "Informações do carregador")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+    })
     public ResponseEntity<Void> bootNotification(@RequestBody BootNotificationDTO payload) {
 
         System.out.println("Recebido BootNotification:");
@@ -48,6 +60,10 @@ public class GatewayController {
 
     //Estado atual de cada conector (Available, Charging, Faulted, etc.)
     @PostMapping("/statusNotification")
+    @Operation(summary = "Estado atual de cada conector", description = "Estado atual de cada conector")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+    })
     public ResponseEntity<Void> statusNotification(@RequestBody StatusNotificationDTO payload) {
 
         System.out.println("Recebido StatusNotification:");
@@ -67,6 +83,10 @@ public class GatewayController {
 
     //dizer se o carregador está ativo
     @PostMapping("/heartbeat")
+    @Operation(summary = "Monitorar o status de atividade do carregador", description = "Monitorar o status de atividade do carregador")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+    })
     public ResponseEntity<Void> heartbeat(@RequestBody HeartbeatDTO payload) {
 
         System.out.println("Recebido heartbeat:");
@@ -79,6 +99,10 @@ public class GatewayController {
 
 
     @PostMapping("/meterValues")
+    @Operation(summary = "Registro de informações de medições de carregamento", description = "Registro de informações de medições de carregamento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+    })
     public ResponseEntity<Void> meterValues(@RequestBody MeterValuesCompletoDTO payload) {
 
         System.out.println("Recebido meterValues:");
