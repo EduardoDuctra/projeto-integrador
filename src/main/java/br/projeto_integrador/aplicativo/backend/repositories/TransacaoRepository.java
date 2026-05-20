@@ -4,7 +4,11 @@ import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,5 +26,12 @@ public interface TransacaoRepository extends JpaRepository <Transacao, Long> {
     Optional<Transacao> findTopByUsuarioOrderByDataFimDesc(Usuario usuario);
 
     Optional<Transacao> findTopByUsuarioAndDataFimIsNotNullOrderByDataFimDesc(Usuario usuario);
+
+
+    //evitar concorrência
+    // PESSIMISTIC_WRITE -> trava a transação no BD
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM Transacao t WHERE t.id = :id")
+    Optional<Transacao> buscarPorIdComLock(@Param("id") Long id);
 
 }

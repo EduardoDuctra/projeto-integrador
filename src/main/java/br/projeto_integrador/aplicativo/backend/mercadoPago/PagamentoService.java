@@ -9,7 +9,6 @@ import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
 import br.projeto_integrador.aplicativo.backend.websocket.TransacaoSubject;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.payment.PaymentClient;
-import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
 import com.mercadopago.client.preference.PreferenceClient;
 import com.mercadopago.client.preference.PreferenceItemRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
@@ -17,6 +16,7 @@ import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.preference.Preference;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -120,11 +120,13 @@ public class PagamentoService {
      * recebe o webhook
      * se a url dizer approved -> salva como aprovado no bd
      * notifica o observer para atualizar no front
+     * evito a concorrência aqui
      * @param webhookDTO
      * @return String
      * @throws MPException
      * @throws MPApiException
      */
+    @Transactional
     public String processarPagamento(WebhookDTO webhookDTO) throws MPException, MPApiException {
 
         if (webhookDTO.data() == null) {
@@ -143,8 +145,9 @@ public class PagamentoService {
 
             String idTransacao = payment.getExternalReference();
 
+            //evita concorrência
             Transacao transacao = transacaoRepository
-                    .findById(Long.valueOf(idTransacao))
+                    .buscarPorIdComLock(Long.valueOf(idTransacao))
                     .orElseThrow(() -> new RegraDeNegociosException("Erro ao buscar transação no webhook"));
 
             if ("approved".equals(payment.getStatus())) {

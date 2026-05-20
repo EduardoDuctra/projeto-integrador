@@ -4,6 +4,7 @@ import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosExcepti
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
+import br.projeto_integrador.aplicativo.backend.model.enums.StatusNotification;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoTransacao;
@@ -25,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class OcppClientService {
@@ -150,6 +152,16 @@ public class OcppClientService {
         String token = tokenService.gerarToken();
         headers.set("Authorization", "Bearer " + token);
 
+        //não pode em conector carregando
+        Conector conector = conectorRepository
+                .findByCarregador_IdCarregadorAndConnectorIdNoCarregador(
+                        unlockConnectorDTO.chargerId(),
+                        unlockConnectorDTO.connectorId())
+                .orElseThrow(() -> new RegraDeNegociosException("Conector não encontrado"));
+
+        if(conector.getStatusConcetor() == StatusNotification.Charging){
+            throw new RegraDeNegociosException("Conector carregando. Comando não válido");
+        }
 
         HttpEntity<UnlockConnectorDTO> request = new HttpEntity<>(unlockConnectorDTO, headers);
         try {
