@@ -6,6 +6,7 @@ import br.projeto_integrador.aplicativo.backend.model.dto.CarregadorDTO;
 import br.projeto_integrador.aplicativo.backend.model.dto.ConectorDTO;
 import br.projeto_integrador.aplicativo.backend.model.entity.Carregador;
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
+import br.projeto_integrador.aplicativo.backend.model.enums.Cidades;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusCarregador;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.BootNotificationDTO;
 import br.projeto_integrador.aplicativo.backend.repositories.CarregadorRepository;
@@ -102,7 +103,12 @@ public class CarregadorService {
         }
 
         if(dto.cidade() != null){
-            carregador.setCidade(dto.cidade());
+
+            Cidades cidade = Cidades.valueOf(dto.cidade());
+
+            if(cidade == Cidades.Santa_Maria || cidade == Cidades.Cachoeira_do_Sul){
+                carregador.setCidade(dto.cidade());
+            }
         }
 
         if (dto.endereco() != null){
