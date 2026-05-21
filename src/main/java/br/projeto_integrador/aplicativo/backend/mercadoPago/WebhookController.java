@@ -1,9 +1,7 @@
 package br.projeto_integrador.aplicativo.backend.mercadoPago;
 
 
-import br.projeto_integrador.aplicativo.backend.model.dto.VeiculoDTO;
-import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
-import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
+import br.projeto_integrador.aplicativo.backend.exception.RegraDeNegociosException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -61,6 +59,7 @@ public class WebhookController {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RegraDeNegociosException("Erro ao processar WEBHOOK");
         }
 
         return ResponseEntity.ok(confirmacao);

@@ -9,7 +9,6 @@ import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusTransacao;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoTransacao;
-import br.projeto_integrador.aplicativo.backend.repositories.ConectorRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.TransacaoRepository;
 import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
 import br.projeto_integrador.aplicativo.backend.websocket.TransacaoSubject;
@@ -44,6 +43,8 @@ public class TransacaoFinanceiraService {
 
     /**
      * usar somente para CRÉDITO
+     * crio a transação de crédito, mas primeiro ela fica como PENDENTE
+     * notifico o observer
      * @param dto
      * @return TransacaoCreditoDTO
      */
@@ -61,7 +62,7 @@ public class TransacaoFinanceiraService {
 
         transacaoFinanceira.setDataInicio(LocalDateTime.now());
 
-
+        //crio a transação de crédito, mas primeiro ela fica como PENDENTE
         if(dto.valorRecarga() != null) {
             transacaoFinanceira.setTipoTransacao(TipoTransacao.CREDITO);
             transacaoFinanceira.setStatusTransacao(StatusTransacao.PENDENTE);
@@ -227,6 +228,7 @@ public class TransacaoFinanceiraService {
 
     /**
      * atualiza o saldo do usuário
+     * roda no fim da transação de energia
      * @param id
      * @param valor
      */

@@ -2,10 +2,8 @@ package br.projeto_integrador.aplicativo.backend.controller;
 
 import br.projeto_integrador.aplicativo.backend.model.dto.*;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
-import br.projeto_integrador.aplicativo.backend.model.enums.StatusUsuario;
-import br.projeto_integrador.aplicativo.backend.repositories.UsuarioRepository;
-import br.projeto_integrador.aplicativo.backend.security.TokenServiceJWT;
 import br.projeto_integrador.aplicativo.backend.security.TokenServiceGoogle;
+import br.projeto_integrador.aplicativo.backend.security.TokenServiceJWT;
 import br.projeto_integrador.aplicativo.backend.services.AutenticacaoService;
 import br.projeto_integrador.aplicativo.backend.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,8 +56,7 @@ public class AutenticacaoController {
 
         var authToken = new UsernamePasswordAuthenticationToken(
                 dados.email(),
-                dados.senha()
-        );
+                dados.senha());
 
         try {
             Authentication authentication = authenticationManager.authenticate(authToken);

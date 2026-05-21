@@ -45,7 +45,7 @@ public class VeiculoController {
             @ApiResponse(responseCode = "201", description = "Veículo cadastrado",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = VeiculoDTO.class))),
     })
-    public ResponseEntity<VeiculoDTO> cadastraOuAtualizarVeiculoAoUsuario(HttpServletRequest request, @RequestBody VeiculoDTO dto) {
+    public ResponseEntity<VeiculoDTO> cadastraVeiculoAoUsuario(HttpServletRequest request, @RequestBody VeiculoDTO dto) {
 
         Long id = securityUtils.getUsuarioPeloIdToken(request);
         VeiculoDTO veiculo = service.cadastrarVeiculoAoUsuario(id, dto);

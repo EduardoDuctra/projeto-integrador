@@ -189,8 +189,7 @@ public class UsuarioService {
         usuario.setVeiculoPrincipal(veiculo);
         usuarioRepository.save(usuario);
 
-        return
-                "Veículo alterado com sucesso - " + usuario.getVeiculoPrincipal().getModeloCarro();
+        return "Veículo alterado com sucesso - " + usuario.getVeiculoPrincipal().getModeloCarro();
 
     }
 

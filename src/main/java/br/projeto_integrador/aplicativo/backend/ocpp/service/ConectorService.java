@@ -7,7 +7,6 @@ import br.projeto_integrador.aplicativo.backend.model.entity.Carregador;
 import br.projeto_integrador.aplicativo.backend.model.entity.Conector;
 import br.projeto_integrador.aplicativo.backend.model.entity.Transacao;
 import br.projeto_integrador.aplicativo.backend.model.entity.Usuario;
-import br.projeto_integrador.aplicativo.backend.model.enums.StatusCarregador;
 import br.projeto_integrador.aplicativo.backend.model.enums.StatusNotification;
 import br.projeto_integrador.aplicativo.backend.model.enums.TipoConector;
 import br.projeto_integrador.aplicativo.backend.ocpp.dto.MeterValueDTO;
@@ -161,7 +160,11 @@ public class ConectorService {
         }
 
 
-        conectorRepository.save(conector);
+        try {
+            conectorRepository.save(conector);
+        } catch (Exception e) {
+            throw new RegraDeNegociosException("Erro ao atualizar conector");
+        }
 
 
         String response = "Conector ID: " + conector.getId() + "atualizado com sucesso";

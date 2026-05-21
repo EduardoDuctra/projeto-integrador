@@ -118,7 +118,7 @@ public class PagamentoService {
 
     /**
      * recebe o webhook
-     * se a url dizer approved -> salva como aprovado no bd
+     * se a url dizer approved -> salva como aprovado no bd (atualiza de pendente para APROVADO)
      * notifica o observer para atualizar no front
      * evito a concorrência aqui
      * @param webhookDTO

@@ -110,9 +110,11 @@ public class CarregadorService {
         }
 
 
-
-        carregadorRepository.save(carregador);
-
+        try {
+            carregadorRepository.save(carregador);
+        } catch (Exception e) {
+            throw new RegraDeNegociosException("Erro ao atualizar carregador");
+        }
 
         String response = "Carregador ID: " + carregador.getIdCarregador() + "atualizado com sucesso";
 

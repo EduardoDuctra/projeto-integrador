@@ -41,6 +41,7 @@ public class TransacaoService {
     }
 
 
+    //busca transação pelo idConector e idTransacao
     private Transacao buscarTransacaoPorConectorETransacaoID(Conector conector, Long transactionId) {
 
 

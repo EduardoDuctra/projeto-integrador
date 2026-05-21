@@ -68,6 +68,10 @@ public class VeiculoService {
                     );
         }
 
+        if(veiculoDTOS.isEmpty()){
+            throw new RegraDeNegociosException("Nenhum veículo encontrado");
+        }
+
         return veiculoDTOS;
 
     }
