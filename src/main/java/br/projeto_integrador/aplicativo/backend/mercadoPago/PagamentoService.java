@@ -141,7 +141,7 @@ public class PagamentoService {
             MercadoPagoConfig.setAccessToken(accessToken);
 
 
-            //buscar os dados completos do pagamento na API do Mercado Pago usando o id recebido no webhook
+            //buscar os dados completos do pagamento na API do Mercado Pago usando o id recebido no webhookgit
             PaymentClient client = new PaymentClient();
             Payment payment = client.get(paymentId);
 
