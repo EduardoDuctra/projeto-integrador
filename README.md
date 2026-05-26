@@ -2,7 +2,7 @@
 
 ## Sobre o projeto
 
-Este projeto consiste em um backend desenvolvido em Java com Spring Boot para gerenciamento de recarga de veículos elétricos.
+Este projeto consiste em um backend desenvolvido em Java com Spring Boot para gerenciamento de eletropostos da UFSM de recarga de veículos elétricos.
 
 O sistema realiza:
 
