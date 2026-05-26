@@ -139,13 +139,17 @@ public class TransacaoFinanceiraService {
 
             if(transacaoFinanceira.getTipoTransacao().equals(TipoTransacao.CREDITO)) {
 
-                TransacaoCreditoDTO dto = new TransacaoCreditoDTO(
-                        transacaoFinanceira.getValorRecarga(),
-                        transacaoFinanceira.getDataInicio(),
-                        transacaoFinanceira.getId()
-                );
+                if(transacaoFinanceira.getStatusTransacao().equals(StatusTransacao.APROVADA)) {
 
-                listaDTO.add(dto);
+                    TransacaoCreditoDTO dto = new TransacaoCreditoDTO(
+                            transacaoFinanceira.getValorRecarga(),
+                            transacaoFinanceira.getDataInicio(),
+                            transacaoFinanceira.getId()
+                    );
+
+                    listaDTO.add(dto);
+                }
+
 
             }
 
