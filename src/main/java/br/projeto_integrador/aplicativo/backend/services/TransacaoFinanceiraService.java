@@ -238,7 +238,9 @@ public class TransacaoFinanceiraService {
      */
     public void atualizarSaldoUsuario(Long id, BigDecimal valor) {
 
-        Usuario usuario = usuarioService.buscarPorId(id);
+        //lock -> evitar concorrência
+        Usuario usuario = usuarioRepository.buscarPorIdComLock(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         BigDecimal saldoAtual = usuario.getSaldo();
         BigDecimal novoSaldo = saldoAtual.subtract(valor);
