@@ -21,7 +21,7 @@ public interface UsuarioRepository extends JpaRepository <Usuario, Long> {
     //evitar concorrência
     // PESSIMISTIC_WRITE -> trava a transação no BD
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT u FROM Usuario u WHERE u.id = :id")
+    @Query("SELECT u FROM Usuario u WHERE u.idUsuario = :id")
     Optional<Usuario> buscarPorIdComLock(@Param("id") Long id);
 
 
