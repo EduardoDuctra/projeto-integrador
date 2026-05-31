@@ -1,0 +1,34 @@
+services:
+
+  postgres:
+    image: postgres:17
+
+    container_name: postgres_projeto_integrador
+
+    environment:
+      POSTGRES_DB: projeto_integrador
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2016010124
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+
+    container_name: backend_projeto_integrador
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "8080:8080"
+
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:

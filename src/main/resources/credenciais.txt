@@ -1,0 +1,28 @@
+
+
+ocpp.api.secret=OcppUfsm2021
+ocpp.api.issuer=backend-java
+
+
+cloudinary.cloud_name=dcwcurcly
+cloudinary.api_key=447918755185261
+cloudinary.api_secret=C1ZR303q_qu8Q552qAB9noMr5hE
+
+
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=campuscharge870@gmail.com
+spring.mail.password=xzdp cmat hquh dakl
+#senhaemail: UfsmOcpp
+
+api.mercado.pago.token=APP_USR-5352128683654412-050310-ef75ab298d93773373ccabadc42a1b73-3372667123
+
+
+#rodando no meu pc com NGROK -> tirar quando for pro servidor
+#o ngrok serve para pegar o que a api publica posta e transferir pro meu localhost
+#mercadoPafo -> ngrok -> localhost
+
+#ngrok http 8080 ou .\ngrok.exe http 8080
+#a url muda sempre
+ngrok.url=https://procreate-opacity-wrist.ngrok-free.dev/projeto-integrador/webhook
+
