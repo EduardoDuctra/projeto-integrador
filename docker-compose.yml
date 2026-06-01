@@ -10,8 +10,10 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 2016010124
 
+
     ports:
       - "5432:5432"
+
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -25,10 +27,10 @@ services:
       - postgres
 
     ports:
-      - "8080:8080"
+      - "8081:8080"
 
     env_file:
-      - .env
+      - .env.prod
 
 volumes:
   postgres_data:

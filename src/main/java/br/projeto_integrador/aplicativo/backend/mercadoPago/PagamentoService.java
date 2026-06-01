@@ -29,7 +29,7 @@ public class PagamentoService {
     @Value("${api.mercado.pago.token}")
     private String accessToken;
 
-    @Value("${ngrok.url}")
+    @Value("${webhook.url}")
     private String webhookUrl;
 
     private final UsuarioRepository usuarioRepository;
