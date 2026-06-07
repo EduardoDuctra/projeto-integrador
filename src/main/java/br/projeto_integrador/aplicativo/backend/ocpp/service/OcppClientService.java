@@ -63,11 +63,15 @@ public class OcppClientService {
 
 
         //associar a transação ao usuário e conectores
-        Usuario usuario = usuarioRepository.findById(idUsuario).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElseThrow(() -> new RegraDeNegociosException("Usuário não encontrado"));
+
+        if (usuario.getVeiculoPrincipal()==null){
+            throw new RegraDeNegociosException("Informe seu veículo principal");
+        }
 
         Conector conector = conectorRepository.findByCarregador_IdCarregadorAndConnectorIdNoCarregador(
                         remoteStartDTO.chargerId(), remoteStartDTO.connectorId())
-                .orElseThrow(() -> new RuntimeException("Conector não encontrado"));
+                .orElseThrow(() -> new RegraDeNegociosException("Conector não encontrado"));
 
 
         if (conector.getTipo() == TipoConector.CC) {
