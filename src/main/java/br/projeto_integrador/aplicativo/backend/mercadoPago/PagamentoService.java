@@ -165,7 +165,12 @@ public class PagamentoService {
                     Usuario usuario = transacao.getUsuario();
 
                     //atualizar saldo usuario
-                    usuario.setSaldo(usuario.getSaldo().add(transacao.getValorRecarga()));
+                    BigDecimal saldoAtual = usuario.getSaldo();
+
+                    if(saldoAtual == null){
+                        saldoAtual = BigDecimal.ZERO;
+                    }
+                    usuario.setSaldo(saldoAtual.add(transacao.getValorRecarga()));
 
                     usuarioRepository.save(usuario);
                     transacaoRepository.save(transacao);
