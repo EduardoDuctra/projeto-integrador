@@ -1,0 +1,1 @@
+ALTER TABLE carregador ADD COLUMN descricao VARCHAR(50);

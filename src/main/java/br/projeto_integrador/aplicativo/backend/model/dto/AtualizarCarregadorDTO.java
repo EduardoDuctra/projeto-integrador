@@ -8,6 +8,7 @@ public record AtualizarCarregadorDTO(
         Double potenciaCorrenteContinua,
         Double potenciaCorrenteAlternada,
         String cidade,
-        String endereco
+        String endereco,
+        String descricao
 ) {
 }

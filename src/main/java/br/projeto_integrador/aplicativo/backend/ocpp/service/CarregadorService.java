@@ -69,6 +69,7 @@ public class CarregadorService {
         }
 
 
+
         try {
             carregador.setStatusCarregador(StatusCarregador.DISPONIVEL);
             carregadorRepository.save(carregador);
@@ -106,6 +107,10 @@ public class CarregadorService {
 
         if (dto.endereco() != null){
             carregador.setEndereco(dto.endereco());
+        }
+
+        if(dto.descricao() != null){
+            carregador.setDescricao(dto.descricao());
         }
 
 
@@ -180,7 +185,8 @@ public class CarregadorService {
                 CarregadorDTO dto = new CarregadorDTO(
                         c.getIdCarregador(),
                         c.getStatusCarregador(),
-                        c.getCidade()
+                        c.getCidade(),
+                        c.getDescricao()
                 );
 
                 carregadoresDisponiveis.add(dto);

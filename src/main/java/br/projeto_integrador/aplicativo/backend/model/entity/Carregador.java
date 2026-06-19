@@ -48,5 +48,8 @@ public class Carregador {
     @Column(name = "endereco")
     private String endereco;
 
+    @Column(name = "descricao")
+    private String descricao;
+
 
 }
