@@ -125,4 +125,14 @@ public class GatewayController {
         return ResponseEntity.ok().build();
     }
 
+    //todo DTO
+    @PostMapping("/stopTransaction")
+    public ResponseEntity<Void> stopTransaction(@RequestBody Map<String, Object> payload) {
+
+        System.out.println("Recebido stopTransaction:");
+        System.out.println(payload);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

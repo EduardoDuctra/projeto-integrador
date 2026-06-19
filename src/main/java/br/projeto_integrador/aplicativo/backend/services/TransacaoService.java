@@ -44,24 +44,25 @@ public class TransacaoService {
     //busca transação pelo idConector e idTransacao
     private Transacao buscarTransacaoPorConectorETransacaoID(Conector conector, Long transactionId) {
 
-
-        Transacao transacao = transacaoRepository.findByIdTransacao(transactionId)
+        Transacao transacao = transacaoRepository
+                .findTopByConectorAndStatusTransacao(conector, StatusTransacao.Preparing)
                 .orElse(null);
 
-        if (transacao == null) {
+        if (transacao != null) {
 
-            System.out.println("Associando transactionId com transação existente");
+            System.out.println(
+                    "Associando transactionId "
+                            + transactionId
+                            + " à transação "
+                            + transacao.getId());
 
-            transacao = transacaoRepository
-                    .findTopByConectorAndStatusTransacao(conector, StatusTransacao.Preparing)
-                    .orElse(null);
+            transacao.setIdTransacao(transactionId);
+            return transacao;
 
-            if (transacao != null) {
-                transacao.setIdTransacao(transactionId);
-            }
         }
 
-        return transacao;
+        return transacaoRepository.findByIdTransacao(transactionId)
+                .orElse(null);
     }
 
     //atualizar constantemente a tabela
@@ -101,27 +102,58 @@ public class TransacaoService {
                         if ("Transaction.Begin".equals(sample.context())
                                 && transacao.getMeterStart() == null) {
 
+                            System.out.println("=== TRANSACTION BEGIN ===");
+                            System.out.println("TransactionId: " + transacao.getIdTransacao());
+                            System.out.println("Transacao ID banco: " + transacao.getId());
+                            System.out.println("Usuario: " + transacao.getUsuario().getIdUsuario());
+                            System.out.println("MeterStart: " + value);
+
                             transacao.setMeterStart(value);
                             transacao.setStatusTransacao(StatusTransacao.Charging);
 
                         } else if ("Sample.Periodic".equals(sample.context())) {
 
+                            if (transacao.getMeterStart() == null) {
+
+                                System.out.println("MeterStart nulo para transactionId "
+                                        + transacao.getIdTransacao());
+
+                                return;
+                            }
+
                             Double energiaConsumida = value - transacao.getMeterStart();
                             Double energiaKwH = energiaConsumida/1000;
 
-                            transacao.setEnergiaConsumida(energiaKwH);
+
 
                             BigDecimal valorGasto = BigDecimal.valueOf(energiaKwH)
                                     .multiply(transacao.getValorEnergia());
 
+                            System.out.println("=== SAMPLE PERIODIC ===");
+                            System.out.println("TransactionId: " + transacao.getIdTransacao());
+                            System.out.println("MeterStart: " + transacao.getMeterStart());
+                            System.out.println("MeterAtual: " + value);
+                            System.out.println("Energia Wh: " + energiaConsumida);
+                            System.out.println("Energia kWh: " + energiaKwH);
+                            System.out.println("Valor Energia: " + transacao.getValorEnergia());
+                            System.out.println("Valor Gasto: " + valorGasto);
+
                             transacao.setValorRecarga(valorGasto);
+                            transacao.setEnergiaConsumida(energiaKwH);
 
                             //verificar se tem saldo
                             boolean temSaldoCarregar = usuarioSaldo(transacao);
 
+                            System.out.println("Tem saldo? " + temSaldoCarregar);
+
                             if(!temSaldoCarregar){
 
                                 System.out.println("Saldo insuficiente, parando recarga");
+                                System.out.println("=== REMOTESTOP POR SALDO ===");
+                                System.out.println("TransactionId: " + transacao.getIdTransacao());
+                                System.out.println("Saldo: " + transacao.getUsuario().getSaldo());
+                                System.out.println("Usuario: " + transacao.getUsuario().getIdUsuario());
+
 
 
                                 RemoteStopDTO dto = new RemoteStopDTO(conector.getCarregador().getIdCarregador(),
@@ -135,12 +167,30 @@ public class TransacaoService {
 
                         else if ("Transaction.End".equals(sample.context())) {
 
+                            System.out.println("=== TRANSACTION END ===");
+                            System.out.println("TransactionId: " + transacao.getIdTransacao());
+                            System.out.println("MeterStop: " + value);
+
+
+                            if (transacao.getMeterStart() == null) {
+
+                                System.out.println("MeterStart nulo para transactionId "
+                                        + transacao.getIdTransacao());
+
+                                return;
+
+                            }
+
+
                             transacao.setMeterStop(value);
+
 
                             Double energiaConsumida = value - transacao.getMeterStart();
                             Double energiaKwH = energiaConsumida/1000;
 
                             transacao.setEnergiaConsumida(energiaKwH);
+
+
                             transacao.setStatusTransacao(StatusTransacao.Finishing);
                             transacao.setDataFim(LocalDateTime.now());
 
