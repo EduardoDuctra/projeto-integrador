@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -73,6 +74,22 @@ public class OcppClientService {
                         remoteStartDTO.chargerId(), remoteStartDTO.connectorId())
                 .orElseThrow(() -> new RegraDeNegociosException("Conector não encontrado"));
 
+
+        //cancela as pendentes antes de iniciar a nova
+        List<Transacao> preparings =
+                transacaoRepository.findByConectorAndStatusTransacao(
+                        conector,
+                        StatusTransacao.Preparing);
+
+        for (Transacao t : preparings) {
+
+            System.out.println(
+                    "Cancelando transação órfã: " + t.getId());
+
+            t.setStatusTransacao(StatusTransacao.REPROVADA);
+        }
+
+        transacaoRepository.saveAll(preparings);
 
         if (conector.getTipo() == TipoConector.CC) {
 

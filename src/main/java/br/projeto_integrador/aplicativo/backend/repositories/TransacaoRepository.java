@@ -27,6 +27,8 @@ public interface TransacaoRepository extends JpaRepository <Transacao, Long> {
 
     Optional<Transacao> findTopByUsuarioAndDataFimIsNotNullOrderByDataFimDesc(Usuario usuario);
 
+    List<Transacao> findByConectorAndStatusTransacao(Conector conector, StatusTransacao statusTransacao);
+
 
     //evitar concorrência
     // PESSIMISTIC_WRITE -> trava a transação no BD

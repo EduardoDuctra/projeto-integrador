@@ -34,5 +34,5 @@ build/
 
 
 ### ENV FILES ###
-.env
-.env.prod
+#.env
+#.env.prod
