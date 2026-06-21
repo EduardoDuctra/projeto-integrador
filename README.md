@@ -87,9 +87,54 @@ O sistema utiliza WebSocket para atualização em tempo real de:
 
 ---
 
+## Como Rodar
+
+1. Altere na classe PagamentoService o campo 
+```java
+preference.getSandboxInitPoint();
+```  
+para 
+
+```java
+preference.getInitPoint();
+```
+
+2. Crie o arquivo .env.prod com os seguintes itens 
+
+```java
+DB_URL=jdbc:postgresql://postgres:5432/projeto_integrador
+
+MAIL_USERNAME=
+MAIL_PASSWORD=
+
+MP_TOKEN=
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+OCPP_SECRET=OcppUfsm2021
+OCPP_ISSUER=backend-java
+
+WEBHOOK_URL=http://IP-servidor:porta/projeto-integrador/webhook
+URL_OCPP_SERVER=http://IP-servidor:porta
+```
+
+3. Na página da API do MercadoPago, configure o Webhook
+```java
+//IP-servidor:porta/projeto-integrador/webhook
+```
+
+4. No servidor, rode o comando
+```java
+docker compose up --build -d
+```
+
+---
+
 ## Observações
 
-* Este projeto foi desenvolvido para fins acadêmicos.
+
 * O servidor OCPP utilizado na comunicação das estações não está incluído neste repositório.
 
 
