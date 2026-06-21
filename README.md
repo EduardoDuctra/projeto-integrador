@@ -89,7 +89,15 @@ O sistema utiliza WebSocket para atualização em tempo real de:
 
 ## Como Rodar
 
+### URL para documentação do Swagger
+
+```text
+http://200.18.45.228:2065/projeto-integrador/swagger-ui/index.html
+```
+
+
 1. Altere na classe PagamentoService o campo 
+
 ```java
 preference.getSandboxInitPoint();
 ```  
@@ -101,7 +109,7 @@ preference.getInitPoint();
 
 2. Crie o arquivo .env.prod com os seguintes itens 
 
-```java
+```text
 DB_URL=jdbc:postgresql://postgres:5432/projeto_integrador
 
 MAIL_USERNAME=
@@ -121,12 +129,12 @@ URL_OCPP_SERVER=http://IP-servidor:porta
 ```
 
 3. Na página da API do MercadoPago, configure o Webhook
-```java
+```text
 //IP-servidor:porta/projeto-integrador/webhook
 ```
 
 4. No servidor, rode o comando
-```java
+```text
 docker compose up --build -d
 ```
 
