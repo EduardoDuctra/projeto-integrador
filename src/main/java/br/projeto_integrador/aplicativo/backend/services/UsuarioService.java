@@ -206,7 +206,7 @@ public class UsuarioService {
             throw new RegraDeNegociosException("Apenas JPG ou PNG são permitidos");
         }
 
-        long tamanhoMaximo = 2 * 1024 * 1024;
+        long tamanhoMaximo = 10 * 1024 * 1024;
 
         if (foto.getSize() > tamanhoMaximo) {
             throw new RegraDeNegociosException("Imagem muito grande (máx 2MB)");
