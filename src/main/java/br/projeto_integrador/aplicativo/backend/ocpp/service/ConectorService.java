@@ -82,7 +82,7 @@ public class ConectorService {
             conector.setStatusConcetor(payload.status());
         }
 
-        if(payload.status() != StatusNotification.Available){
+        if(payload.status() != StatusNotification.Available && payload.status() != StatusNotification.Preparing){
             conector.setDisponivelUso(false);
         }
         else {
